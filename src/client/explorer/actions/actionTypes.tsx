@@ -1,0 +1,12 @@
+enum actionTypes {
+  SET_SETTINGS,
+  SET_COLLECTIONS,
+  SET_QUERY_INPUT,
+  SET_QUERY_RESULT,
+  START_QUERY,
+  END_QUERY,
+  SHOW_ERROR_MESSAGE,
+  HIDE_ERROR_MESSAGE,
+}
+
+export default actionTypes;
