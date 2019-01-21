@@ -9,11 +9,9 @@
     "sourceMap": true,
     "module": "commonjs",
     "target": "esnext",
-    "jsx": "react",
     "moduleResolution": "node",
-    "typeRoots": ["./node_modules/@types"],
-    "types": ["node"],
-    "outDir": "./dist"
+    "jsx": "react",
+    "outDir": "./dist",
   },
   "include": [
     "./src/**/*"

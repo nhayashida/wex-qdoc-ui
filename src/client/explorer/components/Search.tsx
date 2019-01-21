@@ -3,6 +3,7 @@ import {
   createStyles,
   Card,
   CardContent,
+  Fab,
   IconButton,
   InputBase,
   LinearProgress,
@@ -10,15 +11,15 @@ import {
   Typography,
   WithStyles,
 } from '@material-ui/core';
-import { Search as SearchIcon } from '@material-ui/icons';
+import { ExpandMore as ExpandMoreIcon, Search as SearchIcon } from '@material-ui/icons';
 import { withStyles } from '@material-ui/core/styles';
 import classnames from 'classnames';
 import React, { Component } from 'react';
 import { connect } from 'react-redux';
 import { bindActionCreators, Dispatch } from 'redux';
 import actions from '../actions/actions';
-import { UserSettings } from '../reducers/reducers';
-import { QueryResult } from '../../../server/services/explorer';
+import { UserSettings } from '../services/storage';
+import { QueryInput, QueryResult } from '../../../server/services/explorer';
 
 const styles = (theme: Theme) =>
   createStyles({
@@ -34,15 +35,8 @@ const styles = (theme: Theme) =>
       flexGrow: 1,
       paddingLeft: theme.spacing.unit * 2,
     },
-    iconButton: {
+    searchIconButton: {
       padding: theme.spacing.unit,
-    },
-    progress: {
-      marginTop: theme.spacing.unit * 2,
-      display: 'none',
-      '&.querying': {
-        display: 'block',
-      },
     },
     resultCard: {
       boxShadow: 'none',
@@ -61,47 +55,85 @@ const styles = (theme: Theme) =>
       fontSize: theme.typography.pxToRem(12),
       color: grey[700],
     },
+    moreResultButton: {
+      display: 'flex',
+      padding: theme.spacing.unit * 2,
+      '& button': {
+        flexGrow: 1,
+        boxShadow: 'none',
+        border: `1px solid ${grey[300]}`,
+        color: grey[700],
+        backgroundColor: 'transparent',
+        '& > span': {
+          textTransform: 'none',
+          '& p': {
+            flexGrow: 1,
+            color: 'inherit',
+          },
+          '& .hidden': {
+            visibility: 'hidden',
+          },
+        },
+      },
+    },
+    progress: {
+      margin: `${theme.spacing.unit * 4}px 0 ${theme.spacing.unit * 6}px`,
+      display: 'none',
+      '&.loading': {
+        display: 'block',
+      },
+    },
   });
 
 interface Props extends WithStyles<typeof styles> {
   settings: UserSettings;
-  queryInput: string;
-  queryResult: QueryResult;
-  querying: boolean;
-  setQueryInput: (input: string) => {};
-  query: (input: string) => {};
+  input: QueryInput;
+  result: QueryResult;
+  isQuerying: boolean;
+  setInputText: (text: string) => void;
+  query: (q: string, page: number, count: number) => void;
+  clearResult: () => void;
 }
 
 const mapStateToProps = (state: Props) => ({
   settings: state.settings,
-  queryInput: state.queryInput,
-  queryResult: state.queryResult,
-  querying: state.querying,
+  input: state.input,
+  result: state.result,
+  isQuerying: state.isQuerying,
 });
 
 const mapDispatchToProps = (dispatch: Dispatch) => bindActionCreators(actions, dispatch);
 
 class Search extends Component<Props> {
-  onInputChange = e => {
-    this.props.setQueryInput(e.currentTarget.value);
+  onInputTextChange = e => {
+    this.props.setInputText(e.currentTarget.value);
   };
 
-  onInputKeyDown = e => {
-    if (e.key === 'Enter') {
+  onInputKeyPress = e => {
+    if (e.key === 'Enter' && !e.shiftKey) {
       this.onSearchClick();
     }
   };
 
-  onSearchClick = async () => {
-    this.props.query(this.props.queryInput);
+  onSearchClick = () => {
+    this.props.clearResult();
+
+    const { text, count } = this.props.input;
+    this.props.query(text, 0, count);
   };
 
-  generateResult() {
-    const { classes, queryResult, settings } = this.props;
-    const { docs } = queryResult;
+  onMoreResultsClick = () => {
+    const { text, page, count } = this.props.input;
+    this.props.query(text, page + 1, count);
+  };
+
+  generateResult(): JSX.Element {
+    const { classes, settings, isQuerying } = this.props;
+    const { page, count } = this.props.input;
+    const { numFound, docs } = this.props.result;
 
     const MAX_BODY_LENGH = 500;
-    return (docs || []).map(doc => {
+    const resultDocCards = docs.map(doc => {
       const body = doc.fields[settings.bodyField];
       const title = doc.fields[settings.titleField];
       const link = doc.fields[settings.linkField];
@@ -118,13 +150,31 @@ class Search extends Component<Props> {
         </Card>
       );
     });
+
+    const moreResultsButton =
+      !isQuerying && docs.length && (page + 1) * count < numFound ? (
+        <div className={classes.moreResultButton}>
+          <Fab variant="extended" aria-label="More results" onClick={this.onMoreResultsClick}>
+            <ExpandMoreIcon />
+            <Typography>More results</Typography>
+            <ExpandMoreIcon className="hidden" />
+          </Fab>
+        </div>
+      ) : null;
+
+    return (
+      <div>
+        {resultDocCards}
+        {moreResultsButton}
+      </div>
+    );
   }
 
   render(): JSX.Element {
-    const { classes, queryInput, querying } = this.props;
+    const { classes, input, isQuerying } = this.props;
 
     const progressClasses = classnames(classes.progress, {
-      querying,
+      loading: isQuerying,
     });
     return (
       <div className={classes.root}>
@@ -132,14 +182,14 @@ class Search extends Component<Props> {
           <InputBase
             className={classes.textInput}
             margin="none"
-            value={queryInput}
-            onChange={this.onInputChange}
-            onKeyDown={this.onInputKeyDown}
+            value={input.text}
+            onChange={this.onInputTextChange}
+            onKeyPress={this.onInputKeyPress}
           />
           <IconButton
-            className={classes.iconButton}
+            className={classes.searchIconButton}
             aria-label="Search"
-            color={!queryInput ? 'default' : 'primary'}
+            color={!input.text ? 'default' : 'primary'}
             onClick={this.onSearchClick}
           >
             <SearchIcon />

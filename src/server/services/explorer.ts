@@ -1,16 +1,22 @@
-import { forIn, isArray, pick, zip } from 'lodash';
+import { forIn, isArray, pick } from 'lodash';
 import rp, { RequestPromise } from 'request-promise';
 import logger from '../utils/logger';
+
+export type QueryInput = {
+  text: string;
+  page: number;
+  count: number;
+};
+
+export type QueryResult = {
+  numFound: number;
+  docs: Document[];
+};
 
 export type Document = {
   id: string;
   fields: { [key: string]: string };
   score?: number;
-};
-
-export type QueryResult = {
-  numFound: number;
-  docs?: Document[];
 };
 
 export type Collection = {
@@ -44,27 +50,27 @@ namespace Explorer {
   };
 
   /**
-   * Query a collection to find similar documents
+   * Query similar documents in a collection
    *
    * @param collectionId
    * @param bodyField
-   * @param q
+   * @param text
    * @param options
    */
   export const query = async (
     collectionId: string,
     bodyField: string,
-    q: string,
+    text: string,
     options?: { [key: string]: string },
   ): Promise<QueryResult> => {
-    logger.debug(Object.assign({ collectionId, bodyField, q }, options));
+    logger.debug(Object.assign({ collectionId, bodyField, text }, options));
 
     const path = `/api/v1/explore/${collectionId}/query`;
     const props = Object.assign(
       {
         fl: 'score, *',
         rq: '{!sss}',
-        qdoc: `{ "fields": { "${bodyField}": "${q}" } }`,
+        qdoc: `{ "fields": { "${bodyField}": "${text}" } }`,
       },
       options,
     );
@@ -77,6 +83,7 @@ namespace Explorer {
 
     const result: QueryResult = {
       numFound: res.response.numFound,
+      docs: [],
     };
     if (res.response.docs) {
       result.docs = res.response.docs.map(doc => {
@@ -97,16 +104,19 @@ namespace Explorer {
     return result;
   };
 
+  /**
+   * List collections
+   */
   export const listCollections = async (): Promise<Collection[]> => {
     const res = await request('GET', '/api/v1/collections');
     logger.trace(res);
 
     return res.items.map(item => {
-      const { id, name, datasets } = item;
+      const { id, name, fields, datasets } = item;
       return {
         id,
         name,
-        fields: (item.fields[datasets[0]] as { [key: string]: string }[]).map(field =>
+        fields: (fields[datasets[0]] as { [key: string]: string }[]).map(field =>
           pick(field, ['id', 'label']),
         ),
       };

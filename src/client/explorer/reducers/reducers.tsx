@@ -2,36 +2,18 @@ import { applyMiddleware, combineReducers, createStore as reduxCreateStore } fro
 import { composeWithDevTools } from 'redux-devtools-extension';
 import thunk from 'redux-thunk';
 import actionTypes from '../actions/actionTypes';
-import { Collection, QueryResult } from '../../../server/services/explorer';
-
-export type UserSettings = {
-  collectionId: string;
-  bodyField: string;
-  titleField: string;
-  linkField: string;
-};
+import { UserSettings } from '../services/storage';
+import { Collection, QueryInput, QueryResult } from '../../../server/services/explorer';
 
 const initialState = {
-  settings: {} as UserSettings,
   collections: [] as Collection[],
-  queryInput: '',
-  queryResult: {} as QueryResult,
-  querying: false,
+  settings: {} as UserSettings,
+  input: { text: '', page: 0, count: 10 } as QueryInput,
+  result: { numFound: 0, docs: [] } as QueryResult,
+  isQuerying: false,
   errorMessage: '',
 };
 Object.freeze(initialState);
-
-const settings = (
-  settings: UserSettings = initialState.settings,
-  action: { type: number; settings: UserSettings },
-) => {
-  switch (action.type) {
-    case actionTypes.SET_SETTINGS:
-      return Object.assign({}, settings, action.settings);
-  }
-
-  return settings;
-};
 
 const collections = (
   collections: Collection[] = initialState.collections,
@@ -45,39 +27,54 @@ const collections = (
   return collections;
 };
 
-const queryInput = (
-  queryInput: string = initialState.queryInput,
-  action: { type: number; queryInput: string },
-): string => {
-  switch (action.type) {
-    case actionTypes.SET_QUERY_INPUT:
-      return action.queryInput;
-  }
-
-  return queryInput;
-};
-
-const queryResult = (
-  queryResult: QueryResult = initialState.queryResult,
-  action: { type: number; queryResult: QueryResult },
+const settings = (
+  settings: UserSettings = initialState.settings,
+  action: { type: number; settings: UserSettings },
 ) => {
   switch (action.type) {
-    case actionTypes.SET_QUERY_RESULT:
-      return action.queryResult;
+    case actionTypes.SET_SETTINGS:
+      return Object.assign({}, settings, action.settings);
   }
 
-  return queryResult;
+  return settings;
 };
 
-const querying = (querying: boolean = initialState.querying, action: { type: number }) => {
+const input = (
+  input: QueryInput = initialState.input,
+  action: { type: number; input: QueryInput },
+): QueryInput => {
   switch (action.type) {
-    case actionTypes.START_QUERY:
+    case actionTypes.SET_QUERY_INPUT:
+      return action.input;
+  }
+
+  return input;
+};
+
+const result = (
+  result: QueryResult = initialState.result,
+  action: { type: number; result: QueryResult },
+) => {
+  switch (action.type) {
+    case actionTypes.ADD_QUERY_RESULT:
+      action.result.docs = [...result.docs, ...action.result.docs];
+      return action.result;
+    case actionTypes.CLEAR_QUERY_RESULT:
+      return initialState.result;
+  }
+
+  return result;
+};
+
+const isQuerying = (isQuerying: boolean = initialState.isQuerying, action: { type: number }) => {
+  switch (action.type) {
+    case actionTypes.START_QUERYING:
       return true;
-    case actionTypes.END_QUERY:
+    case actionTypes.STOP_QUERYING:
       return false;
   }
 
-  return querying;
+  return isQuerying;
 };
 
 const errorMessage = (
@@ -96,11 +93,11 @@ const errorMessage = (
 
 export const createStore = () => {
   const reducers = combineReducers({
-    settings,
     collections,
-    queryInput,
-    queryResult,
-    querying,
+    settings,
+    input,
+    result,
+    isQuerying,
     errorMessage,
   });
   return reduxCreateStore(reducers, composeWithDevTools(applyMiddleware(thunk)));

@@ -2,43 +2,52 @@ import { Dispatch } from 'redux';
 import actionTypes from './actionTypes';
 import Explorer from '../services/explorer';
 import Storage from '../services/storage';
-import { Collection, QueryResult } from '../../../server/services/explorer';
+import { Collection, QueryInput, QueryResult } from '../../../server/services/explorer';
 
 const actions = {
-  setQueryInput: (queryInput: string) => ({
-    queryInput,
+  setInput: (input: QueryInput) => ({
+    input,
     type: actionTypes.SET_QUERY_INPUT,
   }),
 
-  setQueryResult: (queryResult: QueryResult) => ({
-    queryResult,
-    type: actionTypes.SET_QUERY_RESULT,
+  setInputText: (text: string) => async (dispatch: Dispatch, getState) => {
+    const { input } = getState();
+    dispatch(actions.setInput(Object.assign({}, input, { text })));
+  },
+
+  addResult: (result: QueryResult) => ({
+    result,
+    type: actionTypes.ADD_QUERY_RESULT,
   }),
 
-  startQuery: () => ({
-    type: actionTypes.START_QUERY,
+  clearResult: () => ({
+    type: actionTypes.CLEAR_QUERY_RESULT,
   }),
 
-  endQuery: () => ({
-    type: actionTypes.END_QUERY,
+  startQuerying: () => ({
+    type: actionTypes.START_QUERYING,
   }),
 
-  query: (input: string) => async (dispatch: Dispatch, getState) => {
+  endQuerying: () => ({
+    type: actionTypes.STOP_QUERYING,
+  }),
+
+  query: (text: string, page: number, count: number) => async (dispatch: Dispatch, getState) => {
     try {
-      // Clear results
-      dispatch(actions.setQueryResult({} as QueryResult));
+      const input = { text, page, count };
+      dispatch(actions.setInput(input));
 
-      dispatch(actions.startQuery());
+      dispatch(actions.startQuerying());
       const { collectionId, bodyField } = getState().settings;
       const res = await Explorer.query(collectionId, bodyField, input);
-      dispatch(actions.endQuery());
+      dispatch(actions.endQuerying());
 
       if (!res.docs || !res.docs.length) {
         throw new Error('No document found');
       }
-      dispatch(actions.setQueryResult(res));
+      dispatch(actions.addResult(res));
     } catch (err) {
-      dispatch(actions.endQuery());
+      dispatch(actions.endQuerying());
       dispatch(actions.showErrorMessage(err.message));
     }
   },

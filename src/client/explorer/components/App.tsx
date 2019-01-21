@@ -134,25 +134,23 @@ class App extends Component<Props, State> {
     return (
       <MuiThemeProvider theme={theme}>
         <CssBaseline />
-        <div>
-          <AppBar className={classes.appBar} position="absolute">
-            <Toolbar className={classes.toolbar}>
-              <Typography className={classes.toolbarTitle} />
-              <IconButton onClick={this.onSettingsOpen}>
-                <SettingsIcon />
-              </IconButton>
-            </Toolbar>
-          </AppBar>
-          <main>
-            <div className={classes.contentHeader} />
-            <div>
-              <Search />
-            </div>
-          </main>
-          <Dialog fullScreen={true} open={settingsOpen} TransitionComponent={Transition}>
-            <Settings onClose={this.onSettingsClose} />
-          </Dialog>
-        </div>
+        <AppBar className={classes.appBar} position="absolute">
+          <Toolbar className={classes.toolbar}>
+            <Typography className={classes.toolbarTitle} />
+            <IconButton onClick={this.onSettingsOpen}>
+              <SettingsIcon />
+            </IconButton>
+          </Toolbar>
+        </AppBar>
+        <main>
+          <div className={classes.contentHeader} />
+          <div>
+            <Search />
+          </div>
+        </main>
+        <Dialog fullScreen={true} open={settingsOpen} TransitionComponent={Transition}>
+          <Settings onClose={this.onSettingsClose} />
+        </Dialog>
         {this.generateNotification()}
       </MuiThemeProvider>
     );

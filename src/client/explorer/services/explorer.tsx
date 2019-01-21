@@ -1,4 +1,4 @@
-import { Collection, QueryResult } from '../../../server/services/explorer';
+import { Collection, QueryInput, QueryResult } from '../../../server/services/explorer';
 
 namespace Explorer {
   /**
@@ -22,21 +22,26 @@ namespace Explorer {
    *
    * @param collectionId
    * @param bodyField
-   * @param q
+   * @param input
    */
   export const query = async (
     collectionId: string,
     bodyField: string,
-    q: string,
+    input: QueryInput,
   ): Promise<QueryResult> => {
     try {
+      const { text, page, count } = input;
       const res = await fetch('/explorer/query', {
         headers: { 'Content-Type': 'application/json' },
         method: 'POST',
         body: JSON.stringify({
           collectionId,
           bodyField,
-          q,
+          text,
+          options: {
+            start: page * count,
+            rows: count,
+          },
         }),
       });
       const data = await res.json();
