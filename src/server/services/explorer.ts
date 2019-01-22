@@ -79,7 +79,9 @@ namespace Explorer {
       .join('');
 
     const res = await request('GET', `${path}?q=*${params}`);
-    logger.trace(res);
+    if (!res.response) {
+      throw { message: res };
+    }
 
     const result: QueryResult = {
       numFound: res.response.numFound,

@@ -20,12 +20,15 @@ import {
   Settings as SettingsIcon,
 } from '@material-ui/icons';
 import { withStyles } from '@material-ui/core/styles';
+import { isArray } from 'lodash';
+import qs from 'query-string';
 import React, { Component } from 'react';
 import { connect } from 'react-redux';
 import { bindActionCreators, Dispatch } from 'redux';
 import Search from './Search';
 import Settings from './Settings';
 import actions from '../actions/actions';
+import { QueryInput } from '../../../server/services/explorer';
 
 const theme = createMuiTheme({
   typography: {
@@ -60,9 +63,12 @@ const styles = (theme: Theme) =>
   });
 
 interface Props extends WithStyles<typeof styles> {
-  errorMessage: string;
+  location: { search: string };
   appTitle: string;
-  initialize: () => void;
+  input: QueryInput;
+  errorMessage: string;
+  initialize: (q?: string) => void;
+  query: (text: string, page: number, count: number) => void;
   hideErrorMessage: () => void;
 }
 
@@ -73,6 +79,7 @@ type State = {
 const mapStateToProps = (state: Props) => ({
   errorMessage: state.errorMessage,
   appTitle: state.appTitle,
+  input: state.input,
 });
 
 const mapDispatchToProps = (dispatch: Dispatch) => bindActionCreators(actions, dispatch);
@@ -91,6 +98,13 @@ class App extends Component<Props, State> {
 
   componentDidMount() {
     this.props.initialize();
+
+    // Execute query if ?q=<query> is set to url
+    const { q } = qs.parse(this.props.location.search);
+    if (q) {
+      const { count } = this.props.input;
+      this.props.query(isArray(q) ? q[0] : q, 0, count);
+    }
   }
 
   onSettingsOpen = () => {

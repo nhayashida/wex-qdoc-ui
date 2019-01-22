@@ -105,21 +105,19 @@ const mapStateToProps = (state: Props) => ({
 const mapDispatchToProps = (dispatch: Dispatch) => bindActionCreators(actions, dispatch);
 
 class Search extends Component<Props> {
+  private inputForm = React.createRef<HTMLFormElement>();
+
   onInputTextChange = e => {
     this.props.setInputText(e.currentTarget.value);
   };
 
   onInputKeyPress = e => {
     if (e.key === 'Enter' && !e.shiftKey) {
-      this.onSearchClick();
+      const elem = this.inputForm.current;
+      if (elem) {
+        elem.submit();
+      }
     }
-  };
-
-  onSearchClick = () => {
-    this.props.clearResult();
-
-    const { text, count } = this.props.input;
-    this.props.query(text, 0, count);
   };
 
   onMoreResultsClick = () => {
@@ -178,23 +176,26 @@ class Search extends Component<Props> {
     });
     return (
       <div className={classes.root}>
-        <div className={classes.inputContainer}>
-          <InputBase
-            className={classes.textInput}
-            margin="none"
-            value={input.text}
-            onChange={this.onInputTextChange}
-            onKeyPress={this.onInputKeyPress}
-          />
-          <IconButton
-            className={classes.searchIconButton}
-            aria-label="Search"
-            color={!input.text ? 'default' : 'primary'}
-            onClick={this.onSearchClick}
-          >
-            <SearchIcon />
-          </IconButton>
-        </div>
+        <form ref={this.inputForm}>
+          <div className={classes.inputContainer}>
+            <InputBase
+              className={classes.textInput}
+              margin="none"
+              name="q"
+              value={input.text}
+              onChange={this.onInputTextChange}
+              onKeyPress={this.onInputKeyPress}
+            />
+            <IconButton
+              className={classes.searchIconButton}
+              type="submit"
+              aria-label="Search"
+              color={!input.text ? 'default' : 'primary'}
+            >
+              <SearchIcon />
+            </IconButton>
+          </div>
+        </form>
         {this.generateResult()}
         <LinearProgress className={progressClasses} variant="query" />
       </div>

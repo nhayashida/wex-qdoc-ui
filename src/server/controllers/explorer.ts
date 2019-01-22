@@ -34,5 +34,3 @@ export const collections = async (req: Request, res: Response) => {
     res.status(500).send(err);
   }
 };
-
-export default { query, collections };

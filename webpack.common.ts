@@ -7,15 +7,14 @@ dotenv.config();
 
 const common: Configuration = {
   entry: {
-    explorer: './src/client/explorer/index.tsx',
+    explorer: path.join(__dirname, 'src/client/explorer/index.tsx'),
   },
   output: {
     filename: '[name].[chunkhash].js',
-    chunkFilename: '[name].[chunkhash].js',
-    path: path.join(__dirname, 'dist'),
+    path: path.join(__dirname, 'dist/explorer'),
+    publicPath: '/explorer',
   },
   optimization: {
-    runtimeChunk: true,
     splitChunks: {
       name: 'vendor',
       chunks: 'initial',
@@ -41,7 +40,7 @@ const common: Configuration = {
   plugins: [
     new HTMLWebpackPlugin({
       filename: 'index.html',
-      template: './src/client/explorer/index.html',
+      template: path.join(__dirname, 'src/client/explorer/index.html'),
       meta: {
         viewport: 'minimum-scale=1, initial-scale=1, width=device-width, shrink-to-fit=no',
       },

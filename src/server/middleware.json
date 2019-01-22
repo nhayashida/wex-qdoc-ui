@@ -42,7 +42,7 @@
   },
   "files": {
     "loopback#static": [{
-      "paths": ["/explorer"],
+      "paths": ["/"],
       "params": "$!../../dist"
     }]
   },
