@@ -38,14 +38,18 @@ const styles = (theme: Theme) =>
     searchIconButton: {
       padding: theme.spacing.unit,
     },
+    resultContainer: {
+      marginTop: theme.spacing.unit * 2,
+    },
     resultCard: {
-      boxShadow: 'none',
+      boxShadow: '0 1px 6px rgba(32, 33, 36, 0.28)',
+      borderRadius: theme.typography.pxToRem(8),
       backgroundColor: 'transparent',
+      marginBottom: theme.spacing.unit * 1.5,
     },
     resultCardContent: {
-      padding: `${theme.spacing.unit * 2}px ${theme.spacing.unit}px`,
       '&:last-child': {
-        paddingBottom: theme.spacing.unit,
+        paddingBottom: theme.spacing.unit * 2,
       },
     },
     retultTitle: {
@@ -57,7 +61,7 @@ const styles = (theme: Theme) =>
     },
     moreResultButton: {
       display: 'flex',
-      padding: theme.spacing.unit * 2,
+      padding: `${theme.spacing.unit}px ${theme.spacing.unit * 2}px`,
       '& button': {
         flexGrow: 1,
         boxShadow: 'none',
@@ -77,7 +81,7 @@ const styles = (theme: Theme) =>
       },
     },
     progress: {
-      margin: `${theme.spacing.unit * 4}px 0 ${theme.spacing.unit * 6}px`,
+      margin: `${theme.spacing.unit * 3}px 0 ${theme.spacing.unit * 6}px`,
       display: 'none',
       '&.loading': {
         display: 'block',
@@ -161,7 +165,7 @@ class Search extends Component<Props> {
       ) : null;
 
     return (
-      <div>
+      <div className={classes.resultContainer}>
         {resultDocCards}
         {moreResultsButton}
       </div>
