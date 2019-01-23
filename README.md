@@ -32,3 +32,11 @@ docker run -it -p 3000:3000 wex-qdoc-ui:latest
 1. Open your local repository with Visual Studio Code
 1. Edit the environment variables in [.env](.env)
 1. Select **Debug** -> **Start Debugging**
+
+
+## Play with app
+1. Open http://localhost:3000/explorer
+1. Open the settings and select a collection and fields
+1. Input a query, then click search
+
+![](screenrecording.gif)

@@ -67,7 +67,7 @@ interface Props extends WithStyles<typeof styles> {
   appTitle: string;
   input: QueryInput;
   errorMessage: string;
-  initialize: (q?: string) => void;
+  initialize: () => void;
   query: (text: string, page: number, count: number) => void;
   hideErrorMessage: () => void;
 }
