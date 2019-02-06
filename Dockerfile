@@ -1,4 +1,4 @@
-FROM node:10.15.0-alpine
+FROM node:10.15.1-alpine
 
 ENV SERVICE_USER=wex
 ENV APP_DIR=/home/$SERVICE_USER/app/

@@ -1,11 +1,10 @@
 import { Dispatch } from 'redux';
 import actionTypes from './actionTypes';
-import Explorer from '../services/explorer';
-import Storage from '../services/storage';
-import { Collection, QueryInput, QueryResult } from '../../../server/services/explorer';
+import explorer from '../services/explorer';
+import storage from '../services/storage';
 
 const actions = {
-  setInput: (input: QueryInput) => ({
+  setInput: (input: Explorer.QueryInput) => ({
     input,
     type: actionTypes.SET_QUERY_INPUT,
   }),
@@ -15,7 +14,7 @@ const actions = {
     dispatch(actions.setInput(Object.assign({}, input, { text })));
   },
 
-  addResult: (result: QueryResult) => ({
+  addResult: (result: Explorer.QueryResult) => ({
     result,
     type: actionTypes.ADD_QUERY_RESULT,
   }),
@@ -29,7 +28,7 @@ const actions = {
   }),
 
   endQuerying: () => ({
-    type: actionTypes.STOP_QUERYING,
+    type: actionTypes.END_QUERYING,
   }),
 
   query: (text: string, page: number, count: number) => async (dispatch: Dispatch, getState) => {
@@ -39,7 +38,7 @@ const actions = {
 
       dispatch(actions.startQuerying());
       const { collectionId, bodyField } = getState().settings;
-      const res = await Explorer.query(collectionId, bodyField, input);
+      const res = await explorer.query(collectionId, bodyField, input);
       dispatch(actions.endQuerying());
 
       if (!res.docs || !res.docs.length) {
@@ -59,21 +58,21 @@ const actions = {
 
   updateSetting: (key: string, value: string) => (dispatch: Dispatch) => {
     const settings = { [key]: value };
-    Storage.set(settings);
+    storage.set(settings);
     dispatch(actions.setSettings(settings));
   },
 
-  setCollections: (collections: Collection[]) => ({
+  setCollections: (collections: Explorer.Collection[]) => ({
     collections,
     type: actionTypes.SET_COLLECTIONS,
   }),
 
   initialize: () => async (dispatch: Dispatch) => {
     try {
-      const settings = Storage.load();
+      const settings = storage.load();
       dispatch(actions.setSettings(settings));
 
-      const collections = await Explorer.listCollections();
+      const collections = await explorer.listCollections();
       dispatch(actions.setCollections(collections));
     } catch (err) {
       dispatch(actions.showErrorMessage(err.message));

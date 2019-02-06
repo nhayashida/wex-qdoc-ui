@@ -28,7 +28,6 @@ import { bindActionCreators, Dispatch } from 'redux';
 import Search from './Search';
 import Settings from './Settings';
 import actions from '../actions/actions';
-import { QueryInput } from '../../../server/services/explorer';
 
 const theme = createMuiTheme({
   typography: {
@@ -65,7 +64,7 @@ const styles = (theme: Theme) =>
 interface Props extends WithStyles<typeof styles> {
   location: { search: string };
   appTitle: string;
-  input: QueryInput;
+  input: Explorer.QueryInput;
   errorMessage: string;
   initialize: () => void;
   query: (text: string, page: number, count: number) => void;

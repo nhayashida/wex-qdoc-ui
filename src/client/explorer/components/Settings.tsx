@@ -17,7 +17,6 @@ import { connect } from 'react-redux';
 import { bindActionCreators, Dispatch } from 'redux';
 import actions from '../actions/actions';
 import { UserSettings } from '../services/storage';
-import { Collection } from '../../../server/services/explorer';
 
 const styles = (theme: Theme) =>
   createStyles({
@@ -43,7 +42,7 @@ const styles = (theme: Theme) =>
   });
 
 interface Props extends WithStyles<typeof styles> {
-  collections: Collection[];
+  collections: Explorer.Collection[];
   settings: UserSettings;
   updateSetting: (key: string, value: string) => void;
   onClose: () => void;

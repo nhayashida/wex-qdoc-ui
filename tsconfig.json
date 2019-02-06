@@ -9,9 +9,15 @@
     "sourceMap": true,
     "module": "commonjs",
     "target": "esnext",
-    "moduleResolution": "node",
     "jsx": "react",
+    "moduleResolution": "node",
     "outDir": "./dist",
+    "baseUrl": ".",
+    "paths": {
+      "*": [
+        "./src/common/types/*"
+      ]
+    }
   },
   "include": [
     "./src/**/*"

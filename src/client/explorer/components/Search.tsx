@@ -19,7 +19,6 @@ import { connect } from 'react-redux';
 import { bindActionCreators, Dispatch } from 'redux';
 import actions from '../actions/actions';
 import { UserSettings } from '../services/storage';
-import { QueryInput, QueryResult } from '../../../server/services/explorer';
 
 const styles = (theme: Theme) =>
   createStyles({
@@ -91,9 +90,9 @@ const styles = (theme: Theme) =>
 
 interface Props extends WithStyles<typeof styles> {
   settings: UserSettings;
-  input: QueryInput;
-  result: QueryResult;
-  isQuerying: boolean;
+  input: Explorer.QueryInput;
+  result: Explorer.QueryResult;
+  querying: boolean;
   setInputText: (text: string) => void;
   query: (q: string, page: number, count: number) => void;
   clearResult: () => void;
@@ -103,7 +102,7 @@ const mapStateToProps = (state: Props) => ({
   settings: state.settings,
   input: state.input,
   result: state.result,
-  isQuerying: state.isQuerying,
+  querying: state.querying,
 });
 
 const mapDispatchToProps = (dispatch: Dispatch) => bindActionCreators(actions, dispatch);
@@ -130,7 +129,7 @@ class Search extends Component<Props> {
   };
 
   generateResult(): JSX.Element {
-    const { classes, settings, isQuerying } = this.props;
+    const { classes, settings, querying } = this.props;
     const { page, count } = this.props.input;
     const { numFound, docs } = this.props.result;
 
@@ -154,7 +153,7 @@ class Search extends Component<Props> {
     });
 
     const moreResultsButton =
-      !isQuerying && docs.length && (page + 1) * count < numFound ? (
+      !querying && docs.length && (page + 1) * count < numFound ? (
         <div className={classes.moreResultButton}>
           <Fab variant="extended" aria-label="More results" onClick={this.onMoreResultsClick}>
             <ExpandMoreIcon />
@@ -173,10 +172,10 @@ class Search extends Component<Props> {
   }
 
   render(): JSX.Element {
-    const { classes, input, isQuerying } = this.props;
+    const { classes, input, querying } = this.props;
 
     const progressClasses = classnames(classes.progress, {
-      loading: isQuerying,
+      loading: querying,
     });
     return (
       <div className={classes.root}>
