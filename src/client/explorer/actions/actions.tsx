@@ -33,10 +33,11 @@ const actions = {
 
   query: (text: string, page: number, count: number) => async (dispatch: Dispatch, getState) => {
     try {
+      dispatch(actions.startQuerying());
+
       const input = { text, page, count };
       dispatch(actions.setInput(input));
 
-      dispatch(actions.startQuerying());
       const { collectionId, bodyField } = getState().settings;
       const res = await explorer.query(collectionId, bodyField, input);
       dispatch(actions.endQuerying());
@@ -46,8 +47,9 @@ const actions = {
       }
       dispatch(actions.addResult(res));
     } catch (err) {
-      dispatch(actions.endQuerying());
       dispatch(actions.showErrorMessage(err.message));
+    } finally {
+      dispatch(actions.endQuerying());
     }
   },
 

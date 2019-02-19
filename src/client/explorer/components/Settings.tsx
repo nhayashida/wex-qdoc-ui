@@ -16,7 +16,6 @@ import React, { Component, SyntheticEvent } from 'react';
 import { connect } from 'react-redux';
 import { bindActionCreators, Dispatch } from 'redux';
 import actions from '../actions/actions';
-import { UserSettings } from '../services/storage';
 
 const styles = (theme: Theme) =>
   createStyles({

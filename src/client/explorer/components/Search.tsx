@@ -14,11 +14,10 @@ import {
 import { ExpandMore as ExpandMoreIcon, Search as SearchIcon } from '@material-ui/icons';
 import { withStyles } from '@material-ui/core/styles';
 import classnames from 'classnames';
-import React, { Component } from 'react';
+import React, { Component, ChangeEvent, KeyboardEvent } from 'react';
 import { connect } from 'react-redux';
 import { bindActionCreators, Dispatch } from 'redux';
 import actions from '../actions/actions';
-import { UserSettings } from '../services/storage';
 
 const styles = (theme: Theme) =>
   createStyles({
@@ -60,7 +59,7 @@ const styles = (theme: Theme) =>
     },
     moreResultButton: {
       display: 'flex',
-      padding: `${theme.spacing.unit}px ${theme.spacing.unit * 2}px`,
+      padding: theme.spacing.unit,
       '& button': {
         flexGrow: 1,
         boxShadow: 'none',
@@ -110,11 +109,11 @@ const mapDispatchToProps = (dispatch: Dispatch) => bindActionCreators(actions, d
 class Search extends Component<Props> {
   private inputForm = React.createRef<HTMLFormElement>();
 
-  onInputTextChange = e => {
+  onInputTextChange = (e: ChangeEvent<HTMLInputElement>) => {
     this.props.setInputText(e.currentTarget.value);
   };
 
-  onInputKeyPress = e => {
+  onInputKeyPress = (e: KeyboardEvent<HTMLInputElement>) => {
     if (e.key === 'Enter' && !e.shiftKey) {
       const elem = this.inputForm.current;
       if (elem) {

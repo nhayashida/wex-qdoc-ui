@@ -1,10 +1,3 @@
-export type UserSettings = {
-  collectionId: string;
-  bodyField: string;
-  titleField: string;
-  linkField: string;
-};
-
 /**
  * Retrive all values in localStorage
  *

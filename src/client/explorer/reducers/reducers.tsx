@@ -2,7 +2,6 @@ import { applyMiddleware, combineReducers, createStore as reduxCreateStore } fro
 import { composeWithDevTools } from 'redux-devtools-extension';
 import thunk from 'redux-thunk';
 import actionTypes from '../actions/actionTypes';
-import { UserSettings } from '../services/storage';
 
 const initialState = {
   collections: [] as Explorer.Collection[],
@@ -16,7 +15,7 @@ Object.freeze(initialState);
 
 const collections = (
   collections: Explorer.Collection[] = initialState.collections,
-  action: { type: number; collections: Explorer.Collection[] },
+  action: { type: string; collections: Explorer.Collection[] },
 ) => {
   switch (action.type) {
     case actionTypes.SET_COLLECTIONS:
@@ -28,7 +27,7 @@ const collections = (
 
 const settings = (
   settings: UserSettings = initialState.settings,
-  action: { type: number; settings: UserSettings },
+  action: { type: string; settings: UserSettings },
 ) => {
   switch (action.type) {
     case actionTypes.SET_SETTINGS:
@@ -40,7 +39,7 @@ const settings = (
 
 const input = (
   input: Explorer.QueryInput = initialState.input,
-  action: { type: number; input: Explorer.QueryInput },
+  action: { type: string; input: Explorer.QueryInput },
 ): Explorer.QueryInput => {
   switch (action.type) {
     case actionTypes.SET_QUERY_INPUT:
@@ -52,7 +51,7 @@ const input = (
 
 const result = (
   result: Explorer.QueryResult = initialState.result,
-  action: { type: number; result: Explorer.QueryResult },
+  action: { type: string; result: Explorer.QueryResult },
 ) => {
   switch (action.type) {
     case actionTypes.ADD_QUERY_RESULT:
@@ -65,7 +64,7 @@ const result = (
   return result;
 };
 
-const querying = (querying: boolean = initialState.querying, action: { type: number }) => {
+const querying = (querying: boolean = initialState.querying, action: { type: string }) => {
   switch (action.type) {
     case actionTypes.START_QUERYING:
       return true;
@@ -78,7 +77,7 @@ const querying = (querying: boolean = initialState.querying, action: { type: num
 
 const errorMessage = (
   errorMessage: string = initialState.errorMessage,
-  action: { type: number; errorMessage: string },
+  action: { type: string; errorMessage: string },
 ): string => {
   switch (action.type) {
     case actionTypes.SHOW_ERROR_MESSAGE:
