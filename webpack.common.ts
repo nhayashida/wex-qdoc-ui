@@ -1,17 +1,19 @@
 import dotenv from 'dotenv';
+import os from 'os';
 import path from 'path';
 import { Configuration } from 'webpack';
+import ForkTsCheckerWebpackPlugin from 'fork-ts-checker-webpack-plugin';
 import HTMLWebpackPlugin from 'html-webpack-plugin';
 
 dotenv.config();
 
 const common: Configuration = {
   entry: {
-    explorer: path.join(__dirname, 'src/client/explorer/index.tsx'),
+    explorer: path.resolve(__dirname, 'src/client/explorer/index.tsx'),
   },
   output: {
     filename: '[name].[chunkhash].js',
-    path: path.join(__dirname, 'dist/explorer'),
+    path: path.resolve(__dirname, 'dist/explorer'),
     publicPath: '/explorer',
   },
   optimization: {
@@ -28,7 +30,21 @@ const common: Configuration = {
       {
         test: /\.(tsx)?$/,
         exclude: /node_modules/,
-        use: [{ loader: 'ts-loader' }],
+        use: [
+          { loader: 'cache-loader' },
+          {
+            loader: 'thread-loader',
+            options: {
+              workers: os.cpus().length - 1,
+            },
+          },
+          {
+            loader: 'ts-loader',
+            options: {
+              happyPackMode: true,
+            },
+          },
+        ],
       },
       {
         test: /\.js$/,
@@ -38,9 +54,10 @@ const common: Configuration = {
     ],
   },
   plugins: [
+    new ForkTsCheckerWebpackPlugin({ checkSyntacticErrors: true }),
     new HTMLWebpackPlugin({
       filename: 'index.html',
-      template: path.join(__dirname, 'src/client/explorer/index.html'),
+      template: path.resolve(__dirname, 'src/client/explorer/index.html'),
       meta: {
         viewport: 'minimum-scale=1, initial-scale=1, width=device-width, shrink-to-fit=no',
       },
