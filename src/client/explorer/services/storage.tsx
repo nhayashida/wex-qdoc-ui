@@ -1,27 +1,31 @@
+import { fromPairs } from 'lodash';
+import localforage from 'localforage';
+
 /**
- * Retrive all values in localStorage
+ * Retrive all key-value pairs in indexed db
  *
  * @returns key-value pairs
  */
-export const load = () => {
-  const props: { [key: string]: string } = {};
-  for (let i = 0; i < localStorage.length; i = i + 1) {
-    const key = localStorage.key(i);
-    if (key) {
-      props[key] = localStorage.getItem(key) || '';
-    }
-  }
-  return props;
+export const load = async () => {
+  const keys = await localforage.keys();
+  return fromPairs(
+    await Promise.all(
+      keys.map(async key => {
+        const value = await localforage.getItem(key);
+        return [key, value];
+      }),
+    ),
+  );
 };
 
 /**
- * Store key-value pairs into localStorage
+ * Store key-value pairs into indexed db
  *
  * @param settings
  */
 export const set = (settings: { [key: string]: string }) => {
   Object.keys(settings).forEach(key => {
-    localStorage.setItem(key, settings[key].toString());
+    localforage.setItem(key, settings[key].toString());
   });
 };
 

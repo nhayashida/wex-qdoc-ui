@@ -12,7 +12,7 @@ import {
 } from '@material-ui/core';
 import { Close as CloseIcon } from '@material-ui/icons';
 import { withStyles } from '@material-ui/core/styles';
-import React, { SyntheticEvent } from 'react';
+import React, { SyntheticEvent, useEffect } from 'react';
 import { connect } from 'react-redux';
 import { bindActionCreators, Dispatch } from 'redux';
 import actions from '../actions/actions';
@@ -43,6 +43,7 @@ const styles = (theme: Theme) =>
 interface Props extends WithStyles<typeof styles> {
   collections: Explorer.Collection[];
   settings: UserSettings;
+  initCollections: () => void;
   updateSetting: (key: string, value: string) => void;
   onClose: () => void;
 }
@@ -63,7 +64,11 @@ const EmptyOption = (
 
 // tslint:disable-next-line: variable-name
 const Settings = (props: Props): JSX.Element => {
-  const { classes, settings, collections, updateSetting, onClose } = props;
+  const { classes, settings, collections, initCollections, updateSetting, onClose } = props;
+
+  useEffect(() => {
+    initCollections();
+  }, []);
 
   const onSelectChange = (e: SyntheticEvent<HTMLSelectElement>) => {
     updateSetting(e.currentTarget.name, e.currentTarget.value);

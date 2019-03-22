@@ -27,7 +27,7 @@ export const query = async (
     });
     const data = await res.json();
     if (!res.ok) {
-      throw new Error(data.message);
+      throw data.error;
     }
     return data;
   } catch (err) {
@@ -43,7 +43,7 @@ export const listCollections = async (): Promise<Explorer.Collection[]> => {
     const res = await fetch('/explorer/collections');
     const data = await res.json();
     if (!res.ok) {
-      throw new Error(data.message);
+      throw data.error;
     }
     return data;
   } catch (err) {

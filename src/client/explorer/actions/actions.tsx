@@ -40,7 +40,6 @@ const actions = {
 
       const { collectionId, bodyField } = getState().settings;
       const res = await explorer.query(collectionId, bodyField, input);
-      dispatch(actions.endQuerying());
 
       if (!res.docs || !res.docs.length) {
         throw new Error('No document found');
@@ -69,13 +68,22 @@ const actions = {
     type: actionTypes.SET_COLLECTIONS,
   }),
 
-  initialize: () => async (dispatch: Dispatch) => {
+  initCollections: () => async (dispatch: Dispatch) => {
+    const collections = await explorer.listCollections();
+    dispatch(actions.setCollections(collections));
+  },
+
+  initialize: (q?: string) => async (dispatch, getState) => {
     try {
-      const settings = storage.load();
+      const settings = await storage.load();
       dispatch(actions.setSettings(settings));
 
-      const collections = await explorer.listCollections();
-      dispatch(actions.setCollections(collections));
+      // Execute query if ?q=<query> is set to url
+      if (q) {
+        const { input } = getState();
+        const { count } = input;
+        dispatch(actions.query(q, 0, count));
+      }
     } catch (err) {
       dispatch(actions.showErrorMessage(err.message));
     }

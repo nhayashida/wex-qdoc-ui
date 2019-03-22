@@ -47,16 +47,13 @@ const styles = (theme: Theme) =>
 
 interface Props extends WithStyles<typeof styles> {
   location: { search: string };
-  input: Explorer.QueryInput;
   errorMessage: string;
-  initialize: () => void;
-  query: (text: string, page: number, count: number) => void;
+  initialize: (q?: string) => void;
   hideErrorMessage: () => void;
 }
 
 const mapStateToProps = (state: Props) => ({
   errorMessage: state.errorMessage,
-  input: state.input,
 });
 
 const mapDispatchToProps = (dispatch: Dispatch) => bindActionCreators(actions, dispatch);
@@ -66,19 +63,13 @@ const Transition = props => <Slide direction="up" {...props} />;
 
 // tslint:disable-next-line: variable-name
 const App = (props: Props): JSX.Element => {
-  const { classes, location, input, errorMessage, initialize, query, hideErrorMessage } = props;
+  const { classes, location, errorMessage, initialize } = props;
 
   const [settingsOpened, setSettingsOpened] = useState(false);
 
   useEffect(() => {
-    initialize();
-
-    // Execute query if ?q=<query> is set to url
     const { q } = qs.parse(location.search);
-    if (q) {
-      const { count } = input;
-      query(isArray(q) ? q[0] : q, 0, count);
-    }
+    initialize((isArray(q) ? q[0] : q) || undefined);
   }, []);
 
   const onSettingsOpen = () => {
