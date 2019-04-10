@@ -7,6 +7,7 @@ import App from './components/App';
 import { createStore } from './reducers/reducers';
 
 ReactDOM.render(
+  // tslint:disable-next-line: jsx-wrap-multiline
   <Provider store={createStore()}>
     <BrowserRouter>
       <Route path="/explorer" component={App} />
