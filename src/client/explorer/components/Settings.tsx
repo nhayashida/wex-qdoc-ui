@@ -15,7 +15,9 @@ import { withStyles } from '@material-ui/core/styles';
 import React, { SyntheticEvent, useEffect } from 'react';
 import { connect } from 'react-redux';
 import { bindActionCreators, Dispatch } from 'redux';
-import actions from '../actions/actions';
+import { Settings } from '../reducers/app/types';
+import actions from '../reducers/actions';
+import { State } from '../reducers/store';
 
 const styles = (theme: Theme) =>
   createStyles({
@@ -41,16 +43,16 @@ const styles = (theme: Theme) =>
   });
 
 interface Props extends WithStyles<typeof styles> {
-  collections: Explorer.Collection[];
-  settings: UserSettings;
+  collections: Collection[];
+  settings: Settings;
   initCollections: () => void;
   updateSetting: (key: string, value: string) => void;
   onClose: () => void;
 }
 
-const mapStateToProps = (state: Props) => ({
-  settings: state.settings,
-  collections: state.collections,
+const mapStateToProps = (state: State) => ({
+  settings: state.app.settings,
+  collections: state.explorer.collections,
 });
 
 const mapDispatchToProps = (dispatch: Dispatch) => bindActionCreators(actions, dispatch);

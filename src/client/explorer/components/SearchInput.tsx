@@ -5,7 +5,8 @@ import { withStyles } from '@material-ui/core/styles';
 import React, { ChangeEvent, KeyboardEvent } from 'react';
 import { connect } from 'react-redux';
 import { bindActionCreators, Dispatch } from 'redux';
-import actions from '../actions/actions';
+import actions from '../reducers/actions';
+import { State } from '../reducers/store';
 
 const styles = (theme: Theme) =>
   createStyles({
@@ -24,12 +25,12 @@ const styles = (theme: Theme) =>
   });
 
 interface Props extends WithStyles<typeof styles> {
-  input: Explorer.QueryInput;
+  input: QueryInput;
   setInputText: (text: string) => void;
 }
 
-const mapStateToProps = (state: Props) => ({
-  input: state.input,
+const mapStateToProps = (state: State) => ({
+  input: state.explorer.input,
 });
 
 const mapDispatchToProps = (dispatch: Dispatch) => bindActionCreators(actions, dispatch);

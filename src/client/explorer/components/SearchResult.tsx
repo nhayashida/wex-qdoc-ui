@@ -13,7 +13,9 @@ import { withStyles } from '@material-ui/core/styles';
 import React from 'react';
 import { connect } from 'react-redux';
 import { bindActionCreators, Dispatch } from 'redux';
-import actions from '../actions/actions';
+import actions from '../reducers/actions';
+import { Settings } from '../reducers/app/types';
+import { State } from '../reducers/store';
 
 const styles = (theme: Theme) =>
   createStyles({
@@ -62,18 +64,18 @@ const styles = (theme: Theme) =>
   });
 
 interface Props extends WithStyles<typeof styles> {
-  settings: UserSettings;
-  input: Explorer.QueryInput;
-  result: Explorer.QueryResult;
+  settings: Settings;
+  input: QueryInput;
+  result: QueryResult;
   querying: boolean;
   query: (q: string, page: number, count: number) => void;
 }
 
-const mapStateToProps = (state: Props) => ({
-  settings: state.settings,
-  input: state.input,
-  result: state.result,
-  querying: state.querying,
+const mapStateToProps = (state: State) => ({
+  settings: state.app.settings,
+  input: state.explorer.input,
+  result: state.explorer.result,
+  querying: state.explorer.querying,
 });
 
 const mapDispatchToProps = (dispatch: Dispatch) => bindActionCreators(actions, dispatch);

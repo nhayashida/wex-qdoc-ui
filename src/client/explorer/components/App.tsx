@@ -22,7 +22,8 @@ import { bindActionCreators, Dispatch } from 'redux';
 import Notification from './Notification';
 import Search from './Search';
 import Settings from './Settings';
-import actions from '../actions/actions';
+import actions from '../reducers/actions';
+import { State } from '../reducers/store';
 
 const theme = createMuiTheme({
   typography: {
@@ -49,11 +50,10 @@ interface Props extends WithStyles<typeof styles> {
   location: { search: string };
   errorMessage: string;
   initialize: (q?: string) => void;
-  hideErrorMessage: () => void;
 }
 
-const mapStateToProps = (state: Props) => ({
-  errorMessage: state.errorMessage,
+const mapStateToProps = (state: State) => ({
+  errorMessage: state.app.errorMessage,
 });
 
 const mapDispatchToProps = (dispatch: Dispatch) => bindActionCreators(actions, dispatch);

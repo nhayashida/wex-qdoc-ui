@@ -8,8 +8,8 @@
 export const query = async (
   collectionId: string,
   bodyField: string,
-  input: Explorer.QueryInput,
-): Promise<Explorer.QueryResult> => {
+  input: QueryInput,
+): Promise<QueryResult> => {
   try {
     const { text, page, count } = input;
     const res = await fetch('/explorer/query', {
@@ -38,7 +38,7 @@ export const query = async (
 /**
  * List collections
  */
-export const listCollections = async (): Promise<Explorer.Collection[]> => {
+export const listCollections = async (): Promise<Collection[]> => {
   try {
     const res = await fetch('/explorer/collections');
     const data = await res.json();

@@ -5,6 +5,8 @@ import React from 'react';
 import { connect } from 'react-redux';
 import SearchInput from './SearchInput';
 import SearchResult from './SearchResult';
+import { Settings } from '../reducers/app/types';
+import { State } from '../reducers/store';
 
 const styles = (theme: Theme) =>
   createStyles({
@@ -21,13 +23,13 @@ const styles = (theme: Theme) =>
   });
 
 interface Props extends WithStyles<typeof styles> {
-  settings: UserSettings;
+  settings: Settings;
   querying: boolean;
 }
 
-const mapStateToProps = (state: Props) => ({
-  settings: state.settings,
-  querying: state.querying,
+const mapStateToProps = (state: State) => ({
+  settings: state.app.settings,
+  querying: state.explorer.querying,
 });
 
 // tslint:disable-next-line: variable-name

@@ -36,7 +36,7 @@ export const query = async (
   bodyField: string,
   text: string,
   options?: { [key: string]: string },
-): Promise<Explorer.QueryResult> => {
+): Promise<QueryResult> => {
   logger.debug(Object.assign({ collectionId, bodyField, text }, options));
 
   const path = `/api/v1/explore/${collectionId}/query`;
@@ -57,7 +57,7 @@ export const query = async (
     throw { message: res };
   }
 
-  const result: Explorer.QueryResult = {
+  const result: QueryResult = {
     numFound: res.response.numFound,
     docs: [],
   };
@@ -83,7 +83,7 @@ export const query = async (
 /**
  * List collections
  */
-export const listCollections = async (): Promise<Explorer.Collection[]> => {
+export const listCollections = async (): Promise<Collection[]> => {
   const res = await request('/api/v1/collections');
   logger.trace(res);
 
