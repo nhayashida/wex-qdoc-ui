@@ -4,11 +4,11 @@ import { Provider } from 'react-redux';
 import { Route } from 'react-router';
 import { BrowserRouter } from 'react-router-dom';
 import App from './components/App';
-import { createStore } from './reducers/reducers';
+import { store } from './reducers/store';
 
 ReactDOM.render(
   // tslint:disable-next-line: jsx-wrap-multiline
-  <Provider store={createStore()}>
+  <Provider store={store}>
     <BrowserRouter>
       <Route path="/explorer" component={App} />
     </BrowserRouter>

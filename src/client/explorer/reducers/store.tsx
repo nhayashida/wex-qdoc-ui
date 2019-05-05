@@ -89,14 +89,13 @@ const errorMessage = (
   return errorMessage;
 };
 
-export const createStore = () => {
-  const reducers = combineReducers({
-    collections,
-    settings,
-    input,
-    result,
-    querying,
-    errorMessage,
-  });
-  return reduxCreateStore(reducers, composeWithDevTools(applyMiddleware(thunk)));
-};
+const rootReducer = combineReducers({
+  collections,
+  settings,
+  input,
+  result,
+  querying,
+  errorMessage,
+});
+
+export const store = reduxCreateStore(rootReducer, composeWithDevTools(applyMiddleware(thunk)));
