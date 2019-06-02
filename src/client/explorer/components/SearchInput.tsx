@@ -1,48 +1,51 @@
+import InputBase from '@material-ui/core/InputBase';
+import IconButton from '@material-ui/core/IconButton';
 import { grey } from '@material-ui/core/colors';
-import { createStyles, IconButton, InputBase, Theme, WithStyles } from '@material-ui/core';
-import { Search as SearchIcon } from '@material-ui/icons';
-import { withStyles } from '@material-ui/core/styles';
+import { Theme } from '@material-ui/core/styles';
+import { makeStyles } from '@material-ui/styles';
+import SearchIcon from '@material-ui/icons/Search';
 import React, { ChangeEvent, KeyboardEvent } from 'react';
 import { connect } from 'react-redux';
 import { bindActionCreators, Dispatch } from 'redux';
-import actions from '../reducers/actions';
+import { setInputText } from '../reducers/actions';
 import { State } from '../reducers/store';
 
-const styles = (theme: Theme) =>
-  createStyles({
-    inputContainer: {
-      display: 'flex',
-      border: `1px solid ${grey[300]}`,
-      borderRadius: theme.typography.pxToRem(16),
-    },
-    textInput: {
-      flexGrow: 1,
-      paddingLeft: theme.spacing.unit * 2,
-    },
-    searchIconButton: {
-      padding: theme.spacing.unit,
-    },
-  });
+const useStyles = makeStyles((theme: Theme) => ({
+  inputContainer: {
+    display: 'flex',
+    border: `1px solid ${grey[300]}`,
+    borderRadius: theme.typography.pxToRem(16),
+  },
+  textInput: {
+    flexGrow: 1,
+    paddingLeft: theme.spacing(2),
+  },
+  searchIconButton: {
+    padding: theme.spacing(1),
+  },
+}));
 
-interface Props extends WithStyles<typeof styles> {
+interface Props {
   input: QueryInput;
-  setInputText: (text: string) => void;
+  setInputText: typeof setInputText;
 }
 
 const mapStateToProps = (state: State) => ({
   input: state.explorer.input,
 });
 
-const mapDispatchToProps = (dispatch: Dispatch) => bindActionCreators(actions, dispatch);
+const mapDispatchToProps = (dispatch: Dispatch) => bindActionCreators({ setInputText }, dispatch);
 
 // tslint:disable-next-line: variable-name
 const SearchInput = (props: Props): JSX.Element => {
-  const { classes, input, setInputText } = props;
+  const { input } = props;
+
+  const classes = useStyles();
 
   const inputFormRef = React.createRef<HTMLFormElement>();
 
   const onInputTextChange = (e: ChangeEvent<HTMLInputElement>) => {
-    setInputText(e.currentTarget.value);
+    props.setInputText(e.currentTarget.value);
   };
 
   const onInputKeyPress = (e: KeyboardEvent<HTMLInputElement>) => {
@@ -81,4 +84,4 @@ const SearchInput = (props: Props): JSX.Element => {
 export default connect(
   mapStateToProps,
   mapDispatchToProps,
-)(withStyles(styles, { withTheme: true })(SearchInput));
+)(SearchInput);

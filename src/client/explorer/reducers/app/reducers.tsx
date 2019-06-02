@@ -1,5 +1,5 @@
 import { combineReducers } from 'redux';
-import { AppState, AppActionTypes, Settings, actionTypes } from './types';
+import { AppState, AppActionTypes, Settings, ActionType } from './types';
 
 const initState: AppState = {
   settings: {} as Settings,
@@ -8,7 +8,7 @@ const initState: AppState = {
 
 const settings = (state = initState.settings, action: AppActionTypes) => {
   switch (action.type) {
-    case actionTypes.SET_SETTINGS:
+    case ActionType.SET_SETTINGS:
       return {
         ...state,
         ...action.settings,
@@ -20,9 +20,9 @@ const settings = (state = initState.settings, action: AppActionTypes) => {
 
 const errorMessage = (state = initState.errorMessage, action: AppActionTypes) => {
   switch (action.type) {
-    case actionTypes.SHOW_ERROR_MESSAGE:
+    case ActionType.SHOW_ERROR_MESSAGE:
       return action.errorMessage;
-    case actionTypes.HIDE_ERROR_MESSAGE:
+    case ActionType.HIDE_ERROR_MESSAGE:
       return initState.errorMessage;
   }
 

@@ -1,4 +1,4 @@
-export enum actionTypes {
+export enum ActionType {
   SET_SETTINGS = 'SET_SETTINGS',
   SHOW_ERROR_MESSAGE = 'SHOW_ERROR_MESSAGE',
   HIDE_ERROR_MESSAGE = 'HIDE_ERROR_MESSAGE',
@@ -17,17 +17,17 @@ export type AppState = {
 };
 
 type SetSettingsAction = {
-  type: typeof actionTypes.SET_SETTINGS;
+  type: typeof ActionType.SET_SETTINGS;
   settings: Settings;
 };
 
 type ShowErrorMessageAction = {
-  type: typeof actionTypes.SHOW_ERROR_MESSAGE;
+  type: typeof ActionType.SHOW_ERROR_MESSAGE;
   errorMessage: string;
 };
 
 type HideErrorMessageAction = {
-  type: typeof actionTypes.HIDE_ERROR_MESSAGE;
+  type: typeof ActionType.HIDE_ERROR_MESSAGE;
 };
 
 export type AppActionTypes = SetSettingsAction & ShowErrorMessageAction & HideErrorMessageAction;

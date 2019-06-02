@@ -13,68 +13,66 @@ import {
 } from './explorer/actions';
 import { State } from './store';
 
-const actions = {
-  setInputText: (text: string) => async (
-    dispatch: ThunkDispatch<State, void, Action>,
-    getState: () => State,
-  ) => {
-    const { input } = getState().explorer;
-    dispatch(setQueryInput(Object.assign({}, input, { text })));
-  },
+export const query = (text: string, page: number, count: number) => async (
+  dispatch: ThunkDispatch<State, void, Action>,
+  getState: () => State,
+) => {
+  try {
+    dispatch(startQuerying());
 
-  query: (text: string, page: number, count: number) => async (
-    dispatch: ThunkDispatch<State, void, Action>,
-    getState: () => State,
-  ) => {
-    try {
-      dispatch(startQuerying());
+    const input = { text, page, count };
+    dispatch(setQueryInput(input));
 
-      const input = { text, page, count };
-      dispatch(setQueryInput(input));
+    const { collectionId, bodyField } = getState().app.settings;
+    const res = await explorer.query(collectionId, bodyField, input);
 
-      const { collectionId, bodyField } = getState().app.settings;
-      const res = await explorer.query(collectionId, bodyField, input);
-
-      if (!res.docs || !res.docs.length) {
-        throw new Error('No document found');
-      }
-      dispatch(addQueryResult(res));
-    } catch (err) {
-      dispatch(showErrorMessage(err.message));
-    } finally {
-      dispatch(endQuerying());
+    if (!res.docs || !res.docs.length) {
+      throw new Error('No document found');
     }
-  },
-
-  updateSetting: (key: string, value: string) => (dispatch: ThunkDispatch<State, void, Action>) => {
-    const settings = { [key]: value } as Settings;
-    storage.set(settings);
-    dispatch(setSettings(settings));
-  },
-
-  initCollections: () => async (dispatch: ThunkDispatch<State, void, Action>) => {
-    const collections = await explorer.listCollections();
-    dispatch(setCollections(collections));
-  },
-
-  initialize: (q?: string) => async (
-    dispatch: ThunkDispatch<State, void, Action>,
-    getState: () => State,
-  ) => {
-    try {
-      const settings = (await storage.load()) as Settings;
-      dispatch(setSettings(settings));
-
-      // Execute query if ?q=<query> is set to url
-      if (q) {
-        const { input } = getState().explorer;
-        const { count } = input;
-        dispatch(actions.query(q, 0, count));
-      }
-    } catch (err) {
-      dispatch(showErrorMessage(err.message));
-    }
-  },
+    dispatch(addQueryResult(res));
+  } catch (err) {
+    dispatch(showErrorMessage(err.message));
+  } finally {
+    dispatch(endQuerying());
+  }
 };
 
-export default actions;
+export const setInputText = (text: string) => async (
+  dispatch: ThunkDispatch<State, void, Action>,
+  getState: () => State,
+) => {
+  const { input } = getState().explorer;
+  dispatch(setQueryInput(Object.assign({}, input, { text })));
+};
+
+export const listCollections = () => async (dispatch: ThunkDispatch<State, void, Action>) => {
+  const collections = await explorer.listCollections();
+  dispatch(setCollections(collections));
+};
+
+export const updateSetting = (key: string, value: string) => (
+  dispatch: ThunkDispatch<State, void, Action>,
+) => {
+  const settings = { [key]: value } as Settings;
+  storage.set(settings);
+  dispatch(setSettings(settings));
+};
+
+export const initialize = (q?: string) => async (
+  dispatch: ThunkDispatch<State, void, Action>,
+  getState: () => State,
+) => {
+  try {
+    const settings = (await storage.load()) as Settings;
+    dispatch(setSettings(settings));
+
+    // Execute query if ?q=<query> is set to url
+    if (q) {
+      const { input } = getState().explorer;
+      const { count } = input;
+      dispatch(query(q, 0, count));
+    }
+  } catch (err) {
+    dispatch(showErrorMessage(err.message));
+  }
+};

@@ -8,7 +8,7 @@ const rootReducer = combineReducers({
   app: appReducer,
   explorer: explorerReducer,
 });
-
 export type State = ReturnType<typeof rootReducer>;
 
-export const store = reduxCreateStore(rootReducer, composeWithDevTools(applyMiddleware(thunk)));
+const store = reduxCreateStore(rootReducer, composeWithDevTools(applyMiddleware(thunk)));
+export default store;

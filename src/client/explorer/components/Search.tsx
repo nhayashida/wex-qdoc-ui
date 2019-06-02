@@ -1,42 +1,41 @@
-import { createStyles, LinearProgress, Theme, WithStyles } from '@material-ui/core';
-import { withStyles } from '@material-ui/core/styles';
-import classnames from 'classnames';
+import LinearProgress from '@material-ui/core/LinearProgress';
+import { Theme } from '@material-ui/core/styles';
+import { makeStyles } from '@material-ui/styles';
+import clsx from 'clsx';
 import React from 'react';
 import { connect } from 'react-redux';
 import SearchInput from './SearchInput';
 import SearchResult from './SearchResult';
-import { Settings } from '../reducers/app/types';
 import { State } from '../reducers/store';
 
-const styles = (theme: Theme) =>
-  createStyles({
-    container: {
-      padding: `${theme.spacing.unit * 2}px`,
+const useStyles = makeStyles((theme: Theme) => ({
+  container: {
+    padding: `${theme.spacing(2)}px`,
+  },
+  progress: {
+    margin: `${theme.spacing(3)}px 0 ${theme.spacing(6)}px`,
+    display: 'none',
+    '&.loading': {
+      display: 'block',
     },
-    progress: {
-      margin: `${theme.spacing.unit * 3}px 0 ${theme.spacing.unit * 6}px`,
-      display: 'none',
-      '&.loading': {
-        display: 'block',
-      },
-    },
-  });
+  },
+}));
 
-interface Props extends WithStyles<typeof styles> {
-  settings: Settings;
+interface Props {
   querying: boolean;
 }
 
 const mapStateToProps = (state: State) => ({
-  settings: state.app.settings,
   querying: state.explorer.querying,
 });
 
 // tslint:disable-next-line: variable-name
 const Search = (props: Props): JSX.Element => {
-  const { classes, querying } = props;
+  const { querying } = props;
 
-  const progressClasses = classnames(classes.progress, {
+  const classes = useStyles();
+
+  const progressClasses = clsx(classes.progress, {
     loading: querying,
   });
   return (
@@ -48,4 +47,4 @@ const Search = (props: Props): JSX.Element => {
   );
 };
 
-export default connect(mapStateToProps)(withStyles(styles, { withTheme: true })(Search));
+export default connect(mapStateToProps)(Search);

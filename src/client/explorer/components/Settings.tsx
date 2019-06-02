@@ -1,53 +1,45 @@
-import {
-  AppBar,
-  Toolbar,
-  createStyles,
-  FormControl,
-  IconButton,
-  InputLabel,
-  NativeSelect,
-  Theme,
-  Typography,
-  WithStyles,
-} from '@material-ui/core';
-import { Close as CloseIcon } from '@material-ui/icons';
-import { withStyles } from '@material-ui/core/styles';
+import AppBar from '@material-ui/core/AppBar';
+import FormControl from '@material-ui/core/FormControl';
+import IconButton from '@material-ui/core/IconButton';
+import InputLabel from '@material-ui/core/InputLabel';
+import NativeSelect from '@material-ui/core/NativeSelect';
+import Typography from '@material-ui/core/Typography';
+import Toolbar from '@material-ui/core/Toolbar';
+import CloseIcon from '@material-ui/icons/Close';
+import { Theme } from '@material-ui/core/styles';
+import { makeStyles } from '@material-ui/styles';
 import React, { SyntheticEvent, useEffect } from 'react';
 import { connect } from 'react-redux';
 import { bindActionCreators, Dispatch } from 'redux';
 import { Settings } from '../reducers/app/types';
-import actions from '../reducers/actions';
+import { listCollections, updateSetting } from '../reducers/actions';
 import { State } from '../reducers/store';
 
-const styles = (theme: Theme) =>
-  createStyles({
-    appBar: {
-      boxShadow: 'none',
-      backgroundColor: 'transparent',
+const useStyles = makeStyles((theme: Theme) => ({
+  appBar: {
+    boxShadow: 'none',
+    backgroundColor: 'transparent',
+    '& > div': {
+      padding: theme.spacing(1),
+      '& > p': {
+        flexGrow: 1,
+      },
     },
-    toolbar: {
-      padding: theme.spacing.unit,
-    },
-    toolbarTitle: {
-      flexGrow: 1,
-    },
-    contentHeader: theme.mixins.toolbar,
-    contentBody: {
-      display: 'flex',
-      flexDirection: 'column',
-      padding: theme.spacing.unit * 2,
-    },
-    formControl: {
-      marginBottom: theme.spacing.unit * 4,
-    },
-  });
+  },
+  contentHeader: theme.mixins.toolbar,
+  contentBody: {
+    display: 'flex',
+    flexDirection: 'column',
+    padding: theme.spacing(2),
+  },
+}));
 
-interface Props extends WithStyles<typeof styles> {
-  collections: Collection[];
-  settings: Settings;
-  initCollections: () => void;
-  updateSetting: (key: string, value: string) => void;
+interface Props {
   onClose: () => void;
+  settings: Settings;
+  collections: Collection[];
+  listCollections: typeof listCollections;
+  updateSetting: typeof updateSetting;
 }
 
 const mapStateToProps = (state: State) => ({
@@ -55,7 +47,8 @@ const mapStateToProps = (state: State) => ({
   collections: state.explorer.collections,
 });
 
-const mapDispatchToProps = (dispatch: Dispatch) => bindActionCreators(actions, dispatch);
+const mapDispatchToProps = (dispatch: Dispatch) =>
+  bindActionCreators({ listCollections, updateSetting }, dispatch);
 
 // tslint:disable-next-line:variable-name
 const EmptyOption = (
@@ -66,14 +59,18 @@ const EmptyOption = (
 
 // tslint:disable-next-line: variable-name
 const Settings = (props: Props): JSX.Element => {
-  const { classes, settings, collections, initCollections, updateSetting, onClose } = props;
+  const { settings, collections } = props;
+
+  const classes = useStyles();
 
   useEffect(() => {
-    initCollections();
+    if (!collections.length) {
+      props.listCollections();
+    }
   }, []);
 
   const onSelectChange = (e: SyntheticEvent<HTMLSelectElement>) => {
-    updateSetting(e.currentTarget.name, e.currentTarget.value);
+    props.updateSetting(e.currentTarget.name, e.currentTarget.value);
   };
 
   const selectProps = [
@@ -99,13 +96,11 @@ const Settings = (props: Props): JSX.Element => {
     const { fields } = collection;
     const fieldOptions = [
       EmptyOption,
-      ...fields.map(field => {
-        return (
-          <option key={field.id} value={field.id}>
-            {field.label}
-          </option>
-        );
-      }),
+      ...fields.map(field => (
+        <option key={field.id} value={field.id}>
+          {field.label}
+        </option>
+      )),
     ];
 
     selectProps.push(
@@ -121,7 +116,7 @@ const Settings = (props: Props): JSX.Element => {
     );
   }
   const selects = selectProps.map(props => (
-    <FormControl key={props.id} className={classes.formControl}>
+    <FormControl key={props.id} margin="normal">
       <InputLabel htmlFor={props.id} shrink={true}>
         {props.label}
       </InputLabel>
@@ -134,9 +129,9 @@ const Settings = (props: Props): JSX.Element => {
   return (
     <div>
       <AppBar className={classes.appBar}>
-        <Toolbar className={classes.toolbar}>
-          <Typography className={classes.toolbarTitle} />
-          <IconButton onClick={onClose}>
+        <Toolbar>
+          <Typography />
+          <IconButton onClick={props.onClose}>
             <CloseIcon />
           </IconButton>
         </Toolbar>
@@ -152,4 +147,4 @@ const Settings = (props: Props): JSX.Element => {
 export default connect(
   mapStateToProps,
   mapDispatchToProps,
-)(withStyles(styles, { withTheme: true })(Settings));
+)(Settings);

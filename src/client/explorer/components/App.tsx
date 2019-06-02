@@ -1,75 +1,62 @@
-import {
-  AppBar,
-  createMuiTheme,
-  createStyles,
-  CssBaseline,
-  Dialog,
-  IconButton,
-  MuiThemeProvider,
-  Slide,
-  Theme,
-  Toolbar,
-  Typography,
-  WithStyles,
-} from '@material-ui/core';
-import { Settings as SettingsIcon } from '@material-ui/icons';
-import { withStyles } from '@material-ui/core/styles';
-import { isArray } from 'lodash';
+import AppBar from '@material-ui/core/AppBar';
+import CssBaseline from '@material-ui/core/CssBaseline';
+import Dialog from '@material-ui/core/Dialog';
+import IconButton from '@material-ui/core/IconButton';
+import Slide from '@material-ui/core/Slide';
+import Toolbar from '@material-ui/core/Toolbar';
+import Typography from '@material-ui/core/Typography';
+import { TransitionProps } from '@material-ui/core/transitions';
+import { Theme, makeStyles, useTheme } from '@material-ui/core/styles';
+import { ThemeProvider } from '@material-ui/styles';
+import SettingsIcon from '@material-ui/icons/Settings';
+import isArray from 'lodash/isArray';
 import qs from 'query-string';
-import React, { useState, useEffect } from 'react';
+import React, { forwardRef, useState, useEffect } from 'react';
 import { connect } from 'react-redux';
-import { bindActionCreators, Dispatch } from 'redux';
+import { Dispatch, bindActionCreators } from 'redux';
+import { initialize } from '../reducers/actions';
 import Notification from './Notification';
 import Search from './Search';
 import Settings from './Settings';
-import actions from '../reducers/actions';
-import { State } from '../reducers/store';
 
-const theme = createMuiTheme({
-  typography: {
-    useNextVariants: true,
+const useStyles = makeStyles((theme: Theme) => ({
+  appBar: {
+    boxShadow: 'none',
+    backgroundColor: 'transparent',
+    '& > div': {
+      padding: theme.spacing(1),
+      '& > p': {
+        flexGrow: 1,
+      },
+    },
   },
-});
+  contentHeader: theme.mixins.toolbar,
+}));
 
-const styles = (theme: Theme) =>
-  createStyles({
-    appBar: {
-      boxShadow: 'none',
-      backgroundColor: 'transparent',
-    },
-    toolbar: {
-      padding: theme.spacing.unit,
-    },
-    toolbarTitle: {
-      flexGrow: 1,
-    },
-    contentHeader: theme.mixins.toolbar,
-  });
-
-interface Props extends WithStyles<typeof styles> {
+interface Props {
   location: { search: string };
-  errorMessage: string;
-  initialize: (q?: string) => void;
+  initialize: typeof initialize;
 }
 
-const mapStateToProps = (state: State) => ({
-  errorMessage: state.app.errorMessage,
-});
-
-const mapDispatchToProps = (dispatch: Dispatch) => bindActionCreators(actions, dispatch);
+const mapDispatchToProps = (dispatch: Dispatch) => bindActionCreators({ initialize }, dispatch);
 
 // tslint:disable-next-line:variable-name
-const Transition = props => <Slide direction="up" {...props} />;
+const Transition = forwardRef<unknown, TransitionProps>((props, ref) => (
+  <Slide direction="right" ref={ref} {...props} />
+));
 
 // tslint:disable-next-line: variable-name
 const App = (props: Props): JSX.Element => {
-  const { classes, location, errorMessage, initialize } = props;
+  const { location } = props;
+
+  const theme = useTheme();
+  const classes = useStyles();
 
   const [settingsOpened, setSettingsOpened] = useState(false);
 
   useEffect(() => {
     const { q } = qs.parse(location.search);
-    initialize((isArray(q) ? q[0] : q) || undefined);
+    props.initialize((isArray(q) ? q[0] : q) || undefined);
   }, []);
 
   const onSettingsOpen = () => {
@@ -81,11 +68,11 @@ const App = (props: Props): JSX.Element => {
   };
 
   return (
-    <MuiThemeProvider theme={theme}>
+    <ThemeProvider theme={theme}>
       <CssBaseline />
       <AppBar className={classes.appBar} position="absolute">
-        <Toolbar className={classes.toolbar}>
-          <Typography className={classes.toolbarTitle} />
+        <Toolbar>
+          <Typography />
           <IconButton onClick={onSettingsOpen}>
             <SettingsIcon />
           </IconButton>
@@ -100,12 +87,12 @@ const App = (props: Props): JSX.Element => {
       <Dialog fullScreen={true} open={settingsOpened} TransitionComponent={Transition}>
         <Settings onClose={onSettingsClose} />
       </Dialog>
-      <Notification errorMessage={errorMessage} />
-    </MuiThemeProvider>
+      <Notification />
+    </ThemeProvider>
   );
 };
 
 export default connect(
-  mapStateToProps,
+  null,
   mapDispatchToProps,
-)(withStyles(styles, { withTheme: true })(App));
+)(App);

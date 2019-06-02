@@ -18,8 +18,6 @@ npm run start
 
 2. Build a Docker image
 ```
-npm install
-npm run build
 docker build -f Dockerfile -t wex-qdoc-ui:latest .
 ```
 
@@ -39,4 +37,4 @@ docker run -it -p 3000:3000 wex-qdoc-ui:latest
 1. Open the settings and select a collection and fields
 1. Input a query, then click search
 
-![](screenrecording.gif)
+![](images/screenrecording.gif)
