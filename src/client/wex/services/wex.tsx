@@ -11,9 +11,9 @@ export const query = async (
   input: QueryInput,
 ): Promise<QueryResult> => {
   const { text, page, count } = input;
-  const res = await fetch('/explorer/query', {
-    headers: { 'Content-Type': 'application/json' },
+  const res = await fetch('/wex/query', {
     method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify({
       collectionId,
       bodyField,
@@ -34,13 +34,13 @@ export const query = async (
  * List collections
  */
 export const listCollections = async (): Promise<Collection[]> => {
-  const res = await fetch('/explorer/collections');
+  const res = await fetch('/wex/collections');
 
   const data = await res.json();
   if (!res.ok) {
     throw data.error;
   }
-  return data;
+  return data.collections;
 };
 
 export default { query, listCollections };

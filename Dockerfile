@@ -1,4 +1,4 @@
-FROM node:12.3.1-alpine
+FROM node:12.4.0-alpine
 
 ENV SERVICE_USER=app
 ENV APP_DIR=/home/$SERVICE_USER/wex-qdoc-ui

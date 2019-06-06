@@ -33,7 +33,7 @@ docker run -it -p 3000:3000 wex-qdoc-ui:latest
 
 
 ## Play with app
-1. Open http://localhost:3000/explorer
+1. Open http://localhost:3000/wex
 1. Open the settings and select a collection and fields
 1. Input a query, then click search
 

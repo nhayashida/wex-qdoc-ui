@@ -10,7 +10,7 @@ dotenv.config();
 
 const common: Configuration = {
   entry: {
-    explorer: path.resolve(__dirname, 'src/client/explorer/index.tsx'),
+    explorer: path.resolve(__dirname, 'src/client/wex/index.tsx'),
   },
   output: {
     filename: '[name].[chunkhash].js',
@@ -72,7 +72,7 @@ const common: Configuration = {
     }),
     new HTMLWebpackPlugin({
       filename: 'index.html',
-      template: path.resolve(__dirname, 'src/client/explorer/index.html'),
+      template: path.resolve(__dirname, 'src/client/wex/index.html'),
       meta: {
         viewport: 'minimum-scale=1, initial-scale=1, width=device-width, shrink-to-fit=no',
       },

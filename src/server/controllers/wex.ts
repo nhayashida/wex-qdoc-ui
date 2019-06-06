@@ -1,5 +1,5 @@
 import { NextFunction, Request, Response } from 'express';
-import explorer from '../services/explorer';
+import explorer from '../services/wex';
 import logger from '../utils/logger';
 
 /**
@@ -29,7 +29,7 @@ export const query = async (req: Request, res: Response, next: NextFunction) => 
 export const collections = async (req: Request, res: Response, next: NextFunction) => {
   try {
     const result = await explorer.listCollections();
-    res.send(result);
+    res.send({ collections: result });
   } catch (err) {
     logger.error(err);
     next(err);

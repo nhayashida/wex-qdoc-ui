@@ -1,6 +1,6 @@
 import { Action } from 'redux';
 import { ThunkDispatch } from 'redux-thunk';
-import explorer from '../services/explorer';
+import explorer from '../services/wex';
 import storage from '../services/storage';
 import { setSettings, showErrorMessage } from './app/actions';
 import { Settings } from './app/types';
@@ -10,7 +10,7 @@ import {
   setQueryInput,
   startQuerying,
   endQuerying,
-} from './explorer/actions';
+} from './wex/actions';
 import { State } from './store';
 
 export const query = (text: string, page: number, count: number) => async (

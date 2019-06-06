@@ -4,7 +4,7 @@ import { grey } from '@material-ui/core/colors';
 import { Theme } from '@material-ui/core/styles';
 import { makeStyles } from '@material-ui/styles';
 import SearchIcon from '@material-ui/icons/Search';
-import React, { ChangeEvent, KeyboardEvent } from 'react';
+import React, { ChangeEvent, KeyboardEvent, useRef } from 'react';
 import { connect } from 'react-redux';
 import { bindActionCreators, Dispatch } from 'redux';
 import { setInputText } from '../reducers/actions';
@@ -42,7 +42,7 @@ const SearchInput = (props: Props): JSX.Element => {
 
   const classes = useStyles();
 
-  const inputFormRef = React.createRef<HTMLFormElement>();
+  const inputFormRef = useRef<HTMLFormElement>(null);
 
   const onInputTextChange = (e: ChangeEvent<HTMLInputElement>) => {
     props.setInputText(e.currentTarget.value);

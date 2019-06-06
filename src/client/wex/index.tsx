@@ -10,7 +10,7 @@ ReactDOM.render(
   // tslint:disable-next-line: jsx-wrap-multiline
   <Provider store={store}>
     <BrowserRouter>
-      <Route path="/explorer" component={App} />
+      <Route path="/wex" component={App} />
     </BrowserRouter>
   </Provider>,
   document.getElementById('app'),
