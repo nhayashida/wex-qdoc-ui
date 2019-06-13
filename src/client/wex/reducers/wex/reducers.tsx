@@ -1,55 +1,55 @@
 import { combineReducers } from 'redux';
-import { ExplorerActionTypes, ExplorerState, actionTypes } from './types';
+import { ActionType, Collection, QueryResult, WexActionTypes, WexState } from './types';
 
-const initState: ExplorerState = {
+const initState: WexState = {
   collections: [] as Collection[],
-  input: { text: '', page: 0, count: 10 } as QueryInput,
+  input: '',
   result: { numFound: 0, docs: [] } as QueryResult,
   querying: false,
 };
 
-const collections = (state = initState.collections, action: ExplorerActionTypes) => {
+const collections = (state = initState.collections, action: WexActionTypes) => {
   switch (action.type) {
-    case actionTypes.SET_COLLECTIONS:
+    case ActionType.SET_COLLECTIONS:
       return action.collections;
   }
 
   return state;
 };
 
-const input = (state = initState.input, action: ExplorerActionTypes) => {
+const input = (state = initState.input, action: WexActionTypes) => {
   switch (action.type) {
-    case actionTypes.SET_QUERY_INPUT:
+    case ActionType.SET_QUERY_INPUT:
       return action.input;
   }
 
   return state;
 };
 
-const result = (state = initState.result, action: ExplorerActionTypes) => {
+const result = (state = initState.result, action: WexActionTypes) => {
   switch (action.type) {
-    case actionTypes.ADD_QUERY_RESULT:
+    case ActionType.ADD_QUERY_RESULT:
       action.result.docs = [...state.docs, ...action.result.docs];
       return action.result;
-    case actionTypes.CLEAR_QUERY_RESULT:
+    case ActionType.CLEAR_QUERY_RESULT:
       return initState.result;
   }
 
   return state;
 };
 
-const querying = (state = initState.querying, action: ExplorerActionTypes) => {
+const querying = (state = initState.querying, action: WexActionTypes) => {
   switch (action.type) {
-    case actionTypes.START_QUERYING:
+    case ActionType.START_QUERYING:
       return true;
-    case actionTypes.END_QUERYING:
+    case ActionType.END_QUERYING:
       return false;
   }
 
   return state;
 };
 
-export const explorerReducer = combineReducers({
+export const wexReducer = combineReducers({
   collections,
   input,
   result,

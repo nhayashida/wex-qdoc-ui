@@ -1,7 +1,7 @@
 import { Action } from 'redux';
 import { ThunkDispatch } from 'redux-thunk';
-import explorer from '../services/wex';
 import storage from '../services/storage';
+import wex from '../services/wex';
 import { setSettings, showErrorMessage } from './app/actions';
 import { Settings } from './app/types';
 import {
@@ -13,18 +13,15 @@ import {
 } from './wex/actions';
 import { State } from './store';
 
-export const query = (text: string, page: number, count: number) => async (
+export const query = (q: string, page: number, count: number) => async (
   dispatch: ThunkDispatch<State, void, Action>,
   getState: () => State,
 ) => {
   try {
     dispatch(startQuerying());
 
-    const input = { text, page, count };
-    dispatch(setQueryInput(input));
-
     const { collectionId, bodyField } = getState().app.settings;
-    const res = await explorer.query(collectionId, bodyField, input);
+    const res = await wex.query({ collectionId, bodyField, q, page, count });
 
     if (!res.docs || !res.docs.length) {
       throw new Error('No document found');
@@ -37,17 +34,13 @@ export const query = (text: string, page: number, count: number) => async (
   }
 };
 
-export const setInputText = (text: string) => async (
-  dispatch: ThunkDispatch<State, void, Action>,
-  getState: () => State,
-) => {
-  const { input } = getState().explorer;
-  dispatch(setQueryInput(Object.assign({}, input, { text })));
-};
-
 export const listCollections = () => async (dispatch: ThunkDispatch<State, void, Action>) => {
-  const collections = await explorer.listCollections();
-  dispatch(setCollections(collections));
+  try {
+    const collections = await wex.listCollections();
+    dispatch(setCollections(collections));
+  } catch (err) {
+    dispatch(showErrorMessage(err.message));
+  }
 };
 
 export const updateSetting = (key: string, value: string) => (
@@ -58,19 +51,15 @@ export const updateSetting = (key: string, value: string) => (
   dispatch(setSettings(settings));
 };
 
-export const initialize = (q?: string) => async (
-  dispatch: ThunkDispatch<State, void, Action>,
-  getState: () => State,
-) => {
+export const initialize = (q?: string) => async (dispatch: ThunkDispatch<State, void, Action>) => {
   try {
     const settings = (await storage.load()) as Settings;
     dispatch(setSettings(settings));
 
     // Execute query if ?q=<query> is set to url
     if (q) {
-      const { input } = getState().explorer;
-      const { count } = input;
-      dispatch(query(q, 0, count));
+      dispatch(setQueryInput(q));
+      dispatch(query(q, 0, 10));
     }
   } catch (err) {
     dispatch(showErrorMessage(err.message));

@@ -11,7 +11,8 @@ import logger from '../utils/logger';
  */
 export const query = async (req: Request, res: Response, next: NextFunction) => {
   try {
-    const result = await explorer.query(req.body);
+    const { collectionId } = req.params;
+    const result = await explorer.query({ collectionId, ...req.query });
     res.send(result);
   } catch (err) {
     logger.error(err);

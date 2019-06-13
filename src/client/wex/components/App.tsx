@@ -12,8 +12,7 @@ import SettingsIcon from '@material-ui/icons/Settings';
 import isArray from 'lodash/isArray';
 import qs from 'query-string';
 import React, { forwardRef, useState, useEffect } from 'react';
-import { connect } from 'react-redux';
-import { Dispatch, bindActionCreators } from 'redux';
+import { useDispatch } from 'react-redux';
 import { initialize } from '../reducers/actions';
 import Notification from './Notification';
 import Search from './Search';
@@ -24,9 +23,18 @@ const useStyles = makeStyles((theme: Theme) => ({
     boxShadow: 'none',
     backgroundColor: 'transparent',
     '& > div': {
-      padding: theme.spacing(1),
+      padding: `0 ${theme.spacing(1)}px`,
       '& > p': {
         flexGrow: 1,
+      },
+    },
+  },
+  main: {
+    padding: theme.spacing(2),
+    '& > div': {
+      width: '100%',
+      [theme.breakpoints.up('md')]: {
+        width: 960,
       },
     },
   },
@@ -35,19 +43,18 @@ const useStyles = makeStyles((theme: Theme) => ({
 
 interface Props {
   location: { search: string };
-  initialize: typeof initialize;
 }
-
-const mapDispatchToProps = (dispatch: Dispatch) => bindActionCreators({ initialize }, dispatch);
 
 // tslint:disable-next-line:variable-name
 const Transition = forwardRef<unknown, TransitionProps>((props, ref) => (
-  <Slide direction="right" ref={ref} {...props} />
+  <Slide direction="up" ref={ref} {...props} />
 ));
 
 // tslint:disable-next-line: variable-name
 const App = (props: Props): JSX.Element => {
   const { location } = props;
+
+  const dispatch = useDispatch();
 
   const theme = useTheme();
   const classes = useStyles();
@@ -56,7 +63,7 @@ const App = (props: Props): JSX.Element => {
 
   useEffect(() => {
     const { q } = qs.parse(location.search);
-    props.initialize((isArray(q) ? q[0] : q) || undefined);
+    dispatch(initialize(((isArray(q) ? q[0] : q) as string) || undefined));
   }, []);
 
   const onSettingsOpen = () => {
@@ -78,9 +85,9 @@ const App = (props: Props): JSX.Element => {
           </IconButton>
         </Toolbar>
       </AppBar>
-      <main>
-        <div className={classes.contentHeader} />
+      <main className={classes.main}>
         <div>
+          <div className={classes.contentHeader} />
           <Search />
         </div>
       </main>
@@ -92,7 +99,4 @@ const App = (props: Props): JSX.Element => {
   );
 };
 
-export default connect(
-  null,
-  mapDispatchToProps,
-)(App);
+export default App;

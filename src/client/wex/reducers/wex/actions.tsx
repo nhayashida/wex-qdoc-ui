@@ -1,28 +1,28 @@
-import { actionTypes } from './types';
+import { ActionType, Collection, QueryResult } from './types';
 
 export const setCollections = (collections: Collection[]) => ({
   collections,
-  type: actionTypes.SET_COLLECTIONS,
+  type: ActionType.SET_COLLECTIONS,
 });
 
-export const setQueryInput = (input: QueryInput) => ({
+export const setQueryInput = (input: string) => ({
   input,
-  type: actionTypes.SET_QUERY_INPUT,
+  type: ActionType.SET_QUERY_INPUT,
 });
 
 export const addQueryResult = (result: QueryResult) => ({
   result,
-  type: actionTypes.ADD_QUERY_RESULT,
+  type: ActionType.ADD_QUERY_RESULT,
 });
 
 export const clearQueryResult = () => ({
-  type: actionTypes.CLEAR_QUERY_RESULT,
+  type: ActionType.CLEAR_QUERY_RESULT,
 });
 
 export const startQuerying = () => ({
-  type: actionTypes.START_QUERYING,
+  type: ActionType.START_QUERYING,
 });
 
 export const endQuerying = () => ({
-  type: actionTypes.END_QUERYING,
+  type: ActionType.END_QUERYING,
 });

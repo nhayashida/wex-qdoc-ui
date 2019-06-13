@@ -10,7 +10,7 @@ const root = async app => {
   router.get('/wex', (req, res) => {
     res.sendFile(path.join(__dirname, '../../../dist', 'index.html'));
   });
-  router.post('/wex/query', bparser.json(), query);
+  router.get('/wex/collections/:collectionId/query', bparser.json(), query);
   router.get('/wex/collections', collections);
   app.use(router);
 };

@@ -2,15 +2,15 @@ import AppBar from '@material-ui/core/AppBar';
 import FormControl from '@material-ui/core/FormControl';
 import IconButton from '@material-ui/core/IconButton';
 import InputLabel from '@material-ui/core/InputLabel';
-import NativeSelect from '@material-ui/core/NativeSelect';
+import MenuItem from '@material-ui/core/MenuItem';
+import Select from '@material-ui/core/Select';
 import Typography from '@material-ui/core/Typography';
 import Toolbar from '@material-ui/core/Toolbar';
 import CloseIcon from '@material-ui/icons/Close';
 import { Theme } from '@material-ui/core/styles';
 import { makeStyles } from '@material-ui/styles';
-import React, { SyntheticEvent, useEffect } from 'react';
-import { connect } from 'react-redux';
-import { bindActionCreators, Dispatch } from 'redux';
+import React, { ChangeEvent, useEffect } from 'react';
+import { useDispatch, useSelector } from 'react-redux';
 import { Settings } from '../reducers/app/types';
 import { listCollections, updateSetting } from '../reducers/actions';
 import { State } from '../reducers/store';
@@ -26,6 +26,16 @@ const useStyles = makeStyles((theme: Theme) => ({
       },
     },
   },
+  main: {
+    display: 'flex',
+    justifyContent: 'center',
+    '& > div': {
+      width: '100%',
+      [theme.breakpoints.up('md')]: {
+        width: 960,
+      },
+    },
+  },
   contentHeader: theme.mixins.toolbar,
   contentBody: {
     display: 'flex',
@@ -36,41 +46,31 @@ const useStyles = makeStyles((theme: Theme) => ({
 
 interface Props {
   onClose: () => void;
-  settings: Settings;
-  collections: Collection[];
-  listCollections: typeof listCollections;
-  updateSetting: typeof updateSetting;
 }
-
-const mapStateToProps = (state: State) => ({
-  settings: state.app.settings,
-  collections: state.explorer.collections,
-});
-
-const mapDispatchToProps = (dispatch: Dispatch) =>
-  bindActionCreators({ listCollections, updateSetting }, dispatch);
 
 // tslint:disable-next-line:variable-name
 const EmptyOption = (
-  <option key="" value="">
+  <MenuItem key="" value="">
     ...
-  </option>
+  </MenuItem>
 );
 
 // tslint:disable-next-line: variable-name
 const Settings = (props: Props): JSX.Element => {
-  const { settings, collections } = props;
+  const dispatch = useDispatch();
+  const settings = useSelector((state: State) => state.app.settings);
+  const collections = useSelector((state: State) => state.wex.collections);
 
   const classes = useStyles();
 
   useEffect(() => {
     if (!collections.length) {
-      props.listCollections();
+      dispatch(listCollections());
     }
   }, []);
 
-  const onSelectChange = (e: SyntheticEvent<HTMLSelectElement>) => {
-    props.updateSetting(e.currentTarget.name, e.currentTarget.value);
+  const onSelectChange = (e: ChangeEvent<{ name: string; value: string }>) => {
+    dispatch(updateSetting(e.target.name, e.target.value));
   };
 
   const selectProps = [
@@ -82,24 +82,24 @@ const Settings = (props: Props): JSX.Element => {
         EmptyOption,
         ...collections.map(collection => {
           return (
-            <option key={collection.id} value={collection.id}>
+            <MenuItem key={collection.id} value={collection.id}>
               {collection.name}
-            </option>
+            </MenuItem>
           );
         }),
       ],
     },
   ];
 
-  const collection = collections.find(collection => collection.id === settings.collectionId);
-  if (collection) {
-    const { fields } = collection;
+  const found = collections.find(collection => collection.id === settings.collectionId);
+  if (found) {
+    const { fields } = found;
     const fieldOptions = [
       EmptyOption,
       ...fields.map(field => (
-        <option key={field.id} value={field.id}>
+        <MenuItem key={field.id} value={field.id}>
           {field.label}
-        </option>
+        </MenuItem>
       )),
     ];
 
@@ -115,19 +115,19 @@ const Settings = (props: Props): JSX.Element => {
       })),
     );
   }
-  const selects = selectProps.map(props => (
+  const selectControls = selectProps.map(props => (
     <FormControl key={props.id} margin="normal">
       <InputLabel htmlFor={props.id} shrink={true}>
         {props.label}
       </InputLabel>
-      <NativeSelect name={props.id} value={props.value} onChange={onSelectChange}>
+      <Select name={props.id} value={props.value} displayEmpty={true} onChange={onSelectChange}>
         {props.options}
-      </NativeSelect>
+      </Select>
     </FormControl>
   ));
 
   return (
-    <div>
+    <React.Fragment>
       <AppBar className={classes.appBar}>
         <Toolbar>
           <Typography />
@@ -136,15 +136,14 @@ const Settings = (props: Props): JSX.Element => {
           </IconButton>
         </Toolbar>
       </AppBar>
-      <main>
-        <div className={classes.contentHeader} />
-        <div className={classes.contentBody}>{selects}</div>
+      <main className={classes.main}>
+        <div>
+          <div className={classes.contentHeader} />
+          <div className={classes.contentBody}>{selectControls}</div>
+        </div>
       </main>
-    </div>
+    </React.Fragment>
   );
 };
 
-export default connect(
-  mapStateToProps,
-  mapDispatchToProps,
-)(Settings);
+export default Settings;
