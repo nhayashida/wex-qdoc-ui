@@ -6,9 +6,9 @@ export enum ActionType {
 
 export type Settings = {
   collectionId: string;
-  bodyField: string;
-  titleField: string;
-  linkField: string;
+  bodyFieldId: string;
+  titleFieldId: string;
+  linkFieldId: string;
 };
 
 export type AppState = {

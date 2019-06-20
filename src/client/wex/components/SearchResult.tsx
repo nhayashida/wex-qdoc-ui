@@ -8,8 +8,8 @@ import { makeStyles } from '@material-ui/styles';
 import ExpandMoreIcon from '@material-ui/icons/ExpandMore';
 import React, { useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
-import { query } from '../reducers/actions';
 import { State } from '../reducers/store';
+import { query } from '../reducers/wex/actions';
 
 const useStyles = makeStyles((theme: Theme) => ({
   container: {
@@ -82,9 +82,9 @@ const SearchResult = (): JSX.Element => {
   const [count] = useState(10);
 
   const resultCards = docs.map(doc => {
-    const body = doc.fields[settings.bodyField];
-    const title = doc.fields[settings.titleField];
-    const link = doc.fields[settings.linkField];
+    const body = doc.fields[settings.bodyFieldId];
+    const title = doc.fields[settings.titleFieldId];
+    const link = doc.fields[settings.linkFieldId];
     return (
       <Card key={doc.id} className={classes.resultCard}>
         <CardContent className={classes.cardContent}>

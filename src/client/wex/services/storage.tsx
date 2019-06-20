@@ -1,4 +1,3 @@
-import { fromPairs } from 'lodash';
 import localforage from 'localforage';
 
 /**
@@ -8,13 +7,8 @@ import localforage from 'localforage';
  */
 export const load = async () => {
   const keys = await localforage.keys();
-  return fromPairs(
-    await Promise.all(
-      keys.map(async key => {
-        const value = await localforage.getItem(key);
-        return [key, value];
-      }),
-    ),
+  return Object.fromEntries(
+    await Promise.all(keys.map(async key => [key, await localforage.getItem(key)])),
   );
 };
 

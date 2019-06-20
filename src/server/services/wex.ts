@@ -1,4 +1,3 @@
-import fromPairs from 'lodash/fromPairs';
 import isArray from 'lodash/isArray';
 import pick from 'lodash/pick';
 import rp, { RequestPromise } from 'request-promise';
@@ -30,10 +29,11 @@ export const listCollections = async () => {
   const { items } = await request('/api/v1/collections');
 
   return items.map(item => {
-    const { id, name, fields, datasets } = item;
+    const { id, name, tags, fields, datasets } = item;
     return {
       id,
       name,
+      bodyFieldId: tags.defaultBodyFieldId,
       fields: (fields[datasets[0]] as { [key: string]: string }[]).map(field =>
         pick(field, ['id', 'label']),
       ),
@@ -49,21 +49,21 @@ export const listCollections = async () => {
  */
 export const query = async (payload: {
   collectionId: string;
-  bodyField: string;
+  bodyFieldId: string;
   q: string;
   start?: number;
   rows?: number;
 }) => {
   logger.debug(payload);
 
-  const { collectionId, bodyField, q, ...rest } = payload;
+  const { collectionId, bodyFieldId, q, ...rest } = payload;
   const urlParams = new URLSearchParams(
     Object.assign(
       {
         q: '*',
         fl: 'score, *',
         rq: '{!sss}',
-        qdoc: `{ "fields": { "${bodyField}": "${q}" } }`,
+        qdoc: `{ "fields": { "${bodyFieldId}": "${q}" } }`,
       },
       rest,
     ),
@@ -81,7 +81,7 @@ export const query = async (payload: {
   if (response.docs) {
     result.docs = response.docs.map(doc => {
       const { id, score, ...rest } = doc;
-      const fields = fromPairs(
+      const fields = Object.fromEntries(
         Object.keys(rest).map(key => {
           const value = rest[key];
           return [key, isArray(value) ? value.join(', ') : value];

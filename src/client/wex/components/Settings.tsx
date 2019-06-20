@@ -1,4 +1,5 @@
 import AppBar from '@material-ui/core/AppBar';
+import CircularProgress from '@material-ui/core/CircularProgress';
 import FormControl from '@material-ui/core/FormControl';
 import IconButton from '@material-ui/core/IconButton';
 import InputLabel from '@material-ui/core/InputLabel';
@@ -9,11 +10,16 @@ import Toolbar from '@material-ui/core/Toolbar';
 import CloseIcon from '@material-ui/icons/Close';
 import { Theme } from '@material-ui/core/styles';
 import { makeStyles } from '@material-ui/styles';
-import React, { ChangeEvent, useEffect } from 'react';
+import clsx from 'clsx';
+import isUndefined from 'lodash/isUndefined';
+import React, { ChangeEvent, useEffect, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { Settings } from '../reducers/app/types';
-import { listCollections, updateSetting } from '../reducers/actions';
 import { State } from '../reducers/store';
+import { updateSettings } from '../reducers/app/actions';
+import { clearQueryResult, listCollections } from '../reducers/wex/actions';
+import { Collection } from '../reducers/wex/types';
+import { usePrevious } from './hooks';
 
 const useStyles = makeStyles((theme: Theme) => ({
   appBar: {
@@ -41,19 +47,27 @@ const useStyles = makeStyles((theme: Theme) => ({
     display: 'flex',
     flexDirection: 'column',
     padding: theme.spacing(2),
+    '&.loading': {
+      display: 'none',
+    },
+  },
+  progress: {
+    position: 'absolute',
+    justifyContent: 'center',
+    alignItems: 'center',
+    width: '100%',
+    height: '100%',
+    display: 'none',
+    '&.loading': {
+      display: 'flex',
+      backgroundColor: 'rgba(255, 255, 255, 0.5)',
+    },
   },
 }));
 
 interface Props {
   onClose: () => void;
 }
-
-// tslint:disable-next-line:variable-name
-const EmptyOption = (
-  <MenuItem key="" value="">
-    ...
-  </MenuItem>
-);
 
 // tslint:disable-next-line: variable-name
 const Settings = (props: Props): JSX.Element => {
@@ -63,65 +77,108 @@ const Settings = (props: Props): JSX.Element => {
 
   const classes = useStyles();
 
+  const [collection, setCollection] = useState<Collection>();
+  const [collectionId, setCollectionId] = useState(settings.collectionId || '');
+  const [titleFieldId, setTitleFieldId] = useState(settings.titleFieldId || '');
+  const [linkFieldId, setLinkFieldId] = useState(settings.linkFieldId || '');
+
+  const prevCollectionId = usePrevious(collectionId);
+
   useEffect(() => {
     if (!collections.length) {
       dispatch(listCollections());
     }
   }, []);
 
-  const onSelectChange = (e: ChangeEvent<{ name: string; value: string }>) => {
-    dispatch(updateSetting(e.target.name, e.target.value));
+  useEffect(() => {
+    const found = collections.find(item => item.id === collectionId);
+    if (found) {
+      setCollection(found);
+    }
+  }, [collections]);
+
+  useEffect(() => {
+    if (!isUndefined(prevCollectionId) && prevCollectionId !== collectionId) {
+      const found = collections.find(item => item.id === collectionId);
+      if (found) {
+        setCollection(found);
+        setTitleFieldId('');
+        setLinkFieldId('');
+
+        dispatch(
+          updateSettings({
+            collectionId,
+            bodyFieldId: found.bodyFieldId,
+            titleFieldId: '',
+            linkFieldId: '',
+          }),
+        );
+
+        dispatch(clearQueryResult());
+      }
+    }
+  }, [collectionId]);
+
+  const onCollectionChange = (e: ChangeEvent<{ value: string }>) => {
+    setCollectionId(e.target.value);
+  };
+
+  const onTitleFieldChange = (e: ChangeEvent<{ name: string; value: string }>) => {
+    const { name, value } = e.target;
+    setTitleFieldId(value);
+    dispatch(updateSettings({ [name]: value }));
+  };
+
+  const onLinkFieldChange = (e: ChangeEvent<{ name: string; value: string }>) => {
+    const { name, value } = e.target;
+    setLinkFieldId(value);
+    dispatch(updateSettings({ [name]: value }));
   };
 
   const selectProps = [
     {
       id: 'collectionId',
       label: 'Collection',
-      value: settings.collectionId,
-      options: [
-        EmptyOption,
-        ...collections.map(collection => {
-          return (
-            <MenuItem key={collection.id} value={collection.id}>
-              {collection.name}
-            </MenuItem>
-          );
-        }),
-      ],
-    },
-  ];
-
-  const found = collections.find(collection => collection.id === settings.collectionId);
-  if (found) {
-    const { fields } = found;
-    const fieldOptions = [
-      EmptyOption,
-      ...fields.map(field => (
-        <MenuItem key={field.id} value={field.id}>
-          {field.label}
+      value: collectionId,
+      onChange: onCollectionChange,
+      options: collections.map(collection => (
+        <MenuItem key={collection.id} value={collection.id}>
+          {collection.name}
         </MenuItem>
       )),
-    ];
-
+    },
+  ];
+  if (collection) {
+    const { fields } = collection;
+    const fieldOptions = fields.map(field => (
+      <MenuItem key={field.id} value={field.id}>
+        {field.label}
+      </MenuItem>
+    ));
     selectProps.push(
       ...[
-        { id: 'bodyField', label: 'Body Field' },
-        { id: 'titleField', label: 'Title Field' },
-        { id: 'linkField', label: 'Link Field' },
-      ].map(props => ({
-        ...props,
-        value: settings[props.id],
-        options: fieldOptions,
-      })),
+        {
+          id: 'titleFieldId',
+          label: 'Title Field',
+          value: titleFieldId,
+          onChange: onTitleFieldChange,
+          options: fieldOptions,
+        },
+        {
+          id: 'linkFieldId',
+          label: 'Link Field',
+          value: linkFieldId,
+          onChange: onLinkFieldChange,
+          options: fieldOptions,
+        },
+      ],
     );
   }
-  const selectControls = selectProps.map(props => (
-    <FormControl key={props.id} margin="normal">
-      <InputLabel htmlFor={props.id} shrink={true}>
-        {props.label}
-      </InputLabel>
-      <Select name={props.id} value={props.value} displayEmpty={true} onChange={onSelectChange}>
-        {props.options}
+  const selectControls = selectProps.map(item => (
+    <FormControl key={item.id} margin="normal">
+      <InputLabel htmlFor={item.id}>{item.label}</InputLabel>
+      <Select name={item.id} value={item.value} onChange={item.onChange}>
+        {item.options}
       </Select>
     </FormControl>
   ));
@@ -139,9 +196,14 @@ const Settings = (props: Props): JSX.Element => {
       <main className={classes.main}>
         <div>
           <div className={classes.contentHeader} />
-          <div className={classes.contentBody}>{selectControls}</div>
+          <div className={clsx(classes.contentBody, { loading: !collections.length })}>
+            {selectControls}
+          </div>
         </div>
       </main>
+      <div className={clsx(classes.progress, { loading: !collections.length })}>
+        <CircularProgress />
+      </div>
     </React.Fragment>
   );
 };

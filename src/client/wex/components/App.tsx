@@ -13,7 +13,7 @@ import isArray from 'lodash/isArray';
 import qs from 'query-string';
 import React, { forwardRef, useState, useEffect } from 'react';
 import { useDispatch } from 'react-redux';
-import { initialize } from '../reducers/actions';
+import { initialize } from '../reducers/app/actions';
 import Notification from './Notification';
 import Search from './Search';
 import Settings from './Settings';
@@ -31,12 +31,6 @@ const useStyles = makeStyles((theme: Theme) => ({
   },
   main: {
     padding: theme.spacing(2),
-    '& > div': {
-      width: '100%',
-      [theme.breakpoints.up('md')]: {
-        width: 960,
-      },
-    },
   },
   contentHeader: theme.mixins.toolbar,
 }));

@@ -23,14 +23,14 @@ export const listCollections = async (): Promise<Collection[]> => {
  */
 export const query = async (payload: {
   collectionId: string;
-  bodyField: string;
+  bodyFieldId: string;
   q: string;
   page?: number;
   count?: number;
 }): Promise<QueryResult> => {
-  const { collectionId, bodyField, q, page, count } = payload;
+  const { collectionId, bodyFieldId, q, page, count } = payload;
   const urlParams = new URLSearchParams({
-    bodyField,
+    bodyFieldId,
     q,
   });
   if (count) {

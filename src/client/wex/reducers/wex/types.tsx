@@ -10,6 +10,7 @@ export enum ActionType {
 export type Collection = {
   id: string;
   name: string;
+  bodyFieldId: string;
   fields: { id: string; label: string }[];
 };
 
