@@ -1,7 +1,7 @@
 import bparser from 'body-parser';
 import path from 'path';
 import { Request, Response, Router } from 'express';
-import { query, collections } from '../controllers/wex';
+import { query, collections } from '../controllers/wex.controller';
 
 const root = async app => {
   const router: Router = app.loopback.Router();
