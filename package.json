@@ -22,7 +22,7 @@
     "dotenv": "^8.0.0",
     "helmet": "^3.18.0",
     "localforage": "^1.7.3",
-    "lodash": "^4.17.11",
+    "lodash": "^4.17.19",
     "loopback": "^3.26.0",
     "loopback-boot": "^3.3.1",
     "pino": "^5.12.6",
